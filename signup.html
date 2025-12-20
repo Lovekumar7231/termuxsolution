@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join The Army</title>
     <link rel="stylesheet" href="auth-style.css">
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+    </script>
+    
+    <script type="text/javascript">
+       (function(){
+          // Your Public Key has been added here
+          emailjs.init("ijs5TFBMM18XzlFac");
+       })();
+    </script>
 </head>
 <body>
 
@@ -15,39 +24,89 @@
 
     <div class="input-group">
         <label>CODENAME (USERNAME)</label>
-        <input type="text" placeholder="Choose Codename">
+        <input type="text" id="username" placeholder="Choose Codename">
     </div>
 
     <div class="input-group">
         <label>ENCRYPTED MAIL (EMAIL)</label>
-        <input type="email" placeholder="email@example.com">
+        <input type="email" id="email" placeholder="email@example.com">
     </div>
 
     <div class="input-group">
         <label>ACCESS KEY (PASSWORD)</label>
-        <small id="strength" style="color:#00ff41;"></small>
-        <input type="password" placeholder="Create Password" onkeyup="checkStrength(this.value)">
+        <input type="password" id="password" placeholder="Create Password">
     </div>
 
-    <button onclick="loading(this, 'Sending OTP...')">
+    <button id="otpBtn" onclick="sendRealOTP()">
         Send Verification Code
     </button>
     
     <div class="input-group">
         <label>EMAIL VERIFICATION CODE</label>
-        <input type="text" placeholder="Enter OTP">
+        <input type="text" id="enteredOtp" placeholder="Enter OTP from Email">
     </div>
 
-    <button onclick="loading(this, 'Verifying...')">
+    <button onclick="verifyOTP()">
         Verify & Signup
     </button>
 
     <div class="auth-links">
-        Already an agent?
-        <a href="login.html">Login Here</a>
+        Already an agent? <a href="login.html">Login Here</a>
     </div>
 </div>
-<script src="auth.js"></script>
+
+<script>
+    let actualOTP = 0;
+
+    function sendRealOTP() {
+        const email = document.getElementById("email").value;
+        const name = document.getElementById("username").value;
+        const btn = document.getElementById("otpBtn");
+
+        if (!email) {
+            alert("⚠️ Email ID is required!");
+            return;
+        }
+
+        btn.innerText = "Sending Email...";
+        
+        // Generate a random 4-digit OTP
+        actualOTP = Math.floor(1000 + Math.random() * 9000);
+
+        // Data to be sent to the email template
+        const emailParams = {
+            name: name,            // Matches {{name}} in your template
+            otp_code: actualOTP,   // Matches {{otp_code}} in your template
+            to_email: email        // The recipient's email
+        };
+
+        // Your Service ID and Template ID are added here
+        emailjs.send("service_idclxul", "template_6sk2up1", emailParams)
+            .then(function(response) {
+                console.log('SUCCESS!', response.status, response.text);
+                alert("✅ OTP Sent to " + email + "\nCheck your Inbox or Spam folder.");
+                btn.innerText = "Resend OTP";
+            }, function(error) {
+                console.log('FAILED...', error);
+                alert("❌ Failed to send OTP.\nError: " + JSON.stringify(error));
+                btn.innerText = "Send Verification Code";
+            });
+    }
+
+    function verifyOTP() {
+        const userOtp = document.getElementById("enteredOtp").value;
+        
+        // Logic to check if the entered OTP matches the generated one
+        if (userOtp == actualOTP && actualOTP !== 0) {
+            alert("🔓 Access Granted! Redirecting to System...");
+            // Redirect to login page
+            window.location.href = "login.html";
+        } else {
+            alert("🚫 ACCESS DENIED: Wrong OTP!");
+        }
+    }
+</script>
+
 </body>
 </html>
 
