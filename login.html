@@ -10,7 +10,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // आपका Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
             authDomain: "termuxhacking-aac55.firebaseapp.com",
@@ -24,22 +23,27 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        // लॉगिन फंक्शन
         window.firebaseLogin = function(username, password) {
+            
+            // 👇 SPECIAL ADMIN LOGIN CHECK
+            if (username === "Admin" && password === "Love@728296#$") {
+                localStorage.setItem("agentName", "COMMANDER (ADMIN)");
+                localStorage.setItem("role", "admin"); // रोल सेट किया
+                alert("⚠️ WELCOME COMMANDER! LOADING ADMIN PANEL...");
+                window.location.href = "admin_panel.html"; // एडमिन पैनल पर भेजें
+                return;
+            }
+
+            // 👇 REGULAR USER LOGIN CHECK
             const dbRef = ref(db);
             get(child(dbRef, `users/${username}`)).then((snapshot) => {
                 if (snapshot.exists()) {
                     const userData = snapshot.val();
                     if (userData.password === password) {
-                        
-                        // 👇 यहाँ डेटा Save हो रहा है
                         localStorage.setItem("agentName", username);
-                        
+                        localStorage.setItem("role", "agent");
                         alert("✅ ACCESS GRANTED! Welcome Agent " + username);
-                        
-                        // 👇 यहाँ Google हटाकर Index.html कर दिया गया है
                         window.location.href = "index.html"; 
-                        
                     } else {
                         alert("🚫 ACCESS DENIED: Wrong Password!");
                     }
@@ -67,11 +71,6 @@
         <input type="password" id="loginPass" placeholder="Enter Password">
     </div>
     
-    <p id="captchaQ" style="color: #00ff41; margin-bottom: 5px; font-weight:bold;">Solve: 5 + 5 = ?</p>
-    <div class="input-group">
-        <input id="captchaAns" type="number" placeholder="Enter Answer">
-    </div>
-    
     <button onclick="checkLogin()">Execute Login</button>
 
     <div class="auth-links">
@@ -81,29 +80,15 @@
 </div>
 
 <script>
-    // Captcha Logic
-    let num1 = Math.floor(Math.random() * 10);
-    let num2 = Math.floor(Math.random() * 10);
-    let sum = num1 + num2;
-    document.getElementById("captchaQ").innerText = "Solve: " + num1 + " + " + num2 + " = ?";
-
     function checkLogin() {
         const enteredUser = document.getElementById("loginUser").value;
         const enteredPass = document.getElementById("loginPass").value;
-        const enteredCaptcha = document.getElementById("captchaAns").value;
 
-        // 1. Captcha Check
-        if (parseInt(enteredCaptcha) !== sum) {
-            alert("🚫 Access Denied: Wrong Math Answer!");
-            return;
-        }
-
-        // 2. Firebase Login Call
         if (window.firebaseLogin) {
             document.querySelector("button").innerText = "Authenticating...";
             window.firebaseLogin(enteredUser, enteredPass);
         } else {
-            alert("Connecting to Database... Try again in 2 seconds.");
+            alert("Connecting to Database...");
         }
     }
 </script>
