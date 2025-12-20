@@ -12,7 +12,6 @@
     
     <script type="text/javascript">
        (function(){
-          // Your Public Key has been added here
           emailjs.init("ijs5TFBMM18XzlFac");
        })();
     </script>
@@ -61,48 +60,47 @@
     function sendRealOTP() {
         const email = document.getElementById("email").value;
         const name = document.getElementById("username").value;
+        const pass = document.getElementById("password").value;
         const btn = document.getElementById("otpBtn");
 
-        if (!email) {
-            alert("⚠️ Email ID is required!");
+        if (!email || !name || !pass) {
+            alert("⚠️ Error: Fill all fields first!");
             return;
         }
 
         btn.innerText = "Sending Email...";
-        
-        // Generate a random 4-digit OTP
         actualOTP = Math.floor(1000 + Math.random() * 9000);
 
-        // Data to be sent to the email template
         const emailParams = {
-            name: name,            // Matches {{name}} in your template
-            otp_code: actualOTP,   // Matches {{otp_code}} in your template
-            to_email: email        // The recipient's email
+            name: name,
+            otp_code: actualOTP,
+            to_email: email
         };
 
-        // Your Service ID and Template ID are added here
         emailjs.send("service_idclxul", "template_6sk2up1", emailParams)
             .then(function(response) {
-                console.log('SUCCESS!', response.status, response.text);
-                alert("✅ OTP Sent to " + email + "\nCheck your Inbox or Spam folder.");
+                alert("✅ OTP Sent to " + email);
                 btn.innerText = "Resend OTP";
             }, function(error) {
-                console.log('FAILED...', error);
-                alert("❌ Failed to send OTP.\nError: " + JSON.stringify(error));
+                alert("❌ Failed. Error: " + JSON.stringify(error));
                 btn.innerText = "Send Verification Code";
             });
     }
 
     function verifyOTP() {
         const userOtp = document.getElementById("enteredOtp").value;
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
         
-        // Logic to check if the entered OTP matches the generated one
         if (userOtp == actualOTP && actualOTP !== 0) {
-            alert("🔓 Access Granted! Redirecting to System...");
-            // Redirect to login page
+            // 👇 यहाँ डेटा Save हो रहा है (जादू)
+            localStorage.setItem("agentName", username);
+            localStorage.setItem("agentPass", password);
+            
+            alert("🔓 Account Created! Login credentials saved.");
             window.location.href = "login.html";
         } else {
-            alert("🚫 ACCESS DENIED: Wrong OTP!");
+            alert("🚫 Wrong OTP!");
         }
     }
 </script>
