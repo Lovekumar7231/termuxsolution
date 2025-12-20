@@ -25,23 +25,26 @@
         
         window.firebaseLogin = function(username, password) {
             
-            // 👇 SPECIAL ADMIN LOGIN CHECK
+            // 👇 ADMIN LOGIN (HARDCODED)
             if (username === "Admin" && password === "Love@728296#$") {
-                localStorage.setItem("agentName", "COMMANDER (ADMIN)");
-                localStorage.setItem("role", "admin"); // रोल सेट किया
-                alert("⚠️ WELCOME COMMANDER! LOADING ADMIN PANEL...");
-                window.location.href = "admin_panel.html"; // एडमिन पैनल पर भेजें
+                alert("⚠️ WELCOME COMMANDER! SYSTEM UNLOCKED.");
+                
+                // Admin Status Set करें
+                localStorage.setItem("agentName", "COMMANDER");
+                localStorage.setItem("isAdmin", "true"); 
+                
+                window.location.href = "index.html"; 
                 return;
             }
 
-            // 👇 REGULAR USER LOGIN CHECK
+            // 👇 REGULAR USER LOGIN
             const dbRef = ref(db);
             get(child(dbRef, `users/${username}`)).then((snapshot) => {
                 if (snapshot.exists()) {
                     const userData = snapshot.val();
                     if (userData.password === password) {
                         localStorage.setItem("agentName", username);
-                        localStorage.setItem("role", "agent");
+                        localStorage.setItem("isAdmin", "false"); // Not Admin
                         alert("✅ ACCESS GRANTED! Welcome Agent " + username);
                         window.location.href = "index.html"; 
                     } else {
