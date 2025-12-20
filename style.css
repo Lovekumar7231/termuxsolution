@@ -1,0 +1,133 @@
+body{
+  margin:0;
+  font-family:Courier New,monospace;
+  background:#0d1117;
+  color:#00ff41;
+}
+header{
+  background:#161b22;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  border-bottom:2px solid #00ff41;
+  z-index:1000;
+}
+.menu-icon {
+  cursor: pointer;
+  font-size: 30px;
+  color: #00ff41;
+  /* Ye line zaroori hai taaki click kaam kare */
+  position: relative; 
+  z-index: 2000; 
+}
+
+.sidebar {
+    height: 100%;
+    width: 0;            /* Shuru mein band (0 width) rahega */
+    position: fixed;     /* Screen par chipka rahega */
+    z-index: 3000;       /* Sabse upar */
+    top: 0;
+    right: 0;            /* Right side se niklega */
+    background-color: #111;
+    
+    /* --- YE DO LINE SABSE ZAROORI HAIN --- */
+    overflow-x: hidden;  /* Jab width 0 ho, to content chup jaye */
+    transition: 0.3s;    /* Smooth animation */
+    /* ------------------------------------- */
+    
+    padding-top: 60px;
+    border-left: 2px solid #00ff41;
+}
+
+/* Ye bhi add karein taaki text toote nahi */
+.sidebar a {
+    padding: 15px 25px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+    border-bottom: 1px solid #222;
+    white-space: nowrap; /* Text ko agli line mein jaane se rokega */
+}
+
+
+/* Sidebar ke links ko sahi se dikhane ke liye */
+.sidebar a {
+    padding: 15px 25px;     /* Thoda gap diya taaki khula dikhe */
+    text-decoration: none;
+    font-size: 18px;        /* Font size set kiya */
+    color: #818181;
+    display: block;         /* SABSE ZAROORI: Ye unhe ek ke niche ek layega */
+    transition: 0.3s;
+    border-bottom: 1px solid #222; /* Har option ke niche halki line */
+}
+
+/* Jab mouse upar le jayein tab ka color */
+.sidebar a:hover {
+    color: #f1f1f1;
+    background-color: #1a1a1a; /* Hover par halka background */
+    padding-left: 35px; /* Hover animation effect */
+}
+
+
+/* Cross button ka style */
+.sidebar .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+  color: #ff0055; /* Red color cross ke liye */
+  text-decoration: none;
+}
+
+.container{padding:20px;text-align:center}
+.card{
+  background:#21262d;
+  padding:20px;
+  margin:15px auto;
+  max-width:400px;
+  border-radius:8px;
+}
+.prime-card-border{border:2px solid #ff0055}
+
+.btn{
+  width:100%;padding:10px;margin-top:10px;
+  background:#00ff41;border:none;cursor:pointer
+}
+.btn-prime{background:#ff0055;color:#fff}
+
+.hidden-section{display:none}
+
+.live-tag{background:red;padding:3px 8px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+
+#live-dashboard-section{
+  display:none;position:fixed;inset:0;background:black;z-index:9999
+}
+.live-header{
+  display:flex;padding:10px;background:#111;color:red
+}
+#chat-box{height:70vh;overflow:auto;padding:10px}
+.chat-input{display:flex;padding:10px}
+.chat-input input{flex:1;padding:10px}
+
+header {
+  background: #161b22;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Center align ensure karega */
+  border-bottom: 2px solid #00ff41;
+  z-index: 1000;
+  position: relative; /* Position relative zaroori hai z-index ke liye */
+}
+
+.menu-icon {
+  cursor: pointer;
+  font-size: 30px; /* Thoda bada kiya */
+  color: #00ff41;  /* Color explicit kiya */
+  z-index: 1001;   /* Header se upar rakha */
+  user-select: none; /* Text selection roka */
+}

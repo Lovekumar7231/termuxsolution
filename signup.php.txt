@@ -1,0 +1,107 @@
+<?php
+session_start();
+include 'db_connect.php';
+
+// STEP 1: OTP GENERATE & SEND
+if (isset($_POST['send_otp'])) {
+    $email = $_POST['email'];
+    // Check if email already exists
+    $check = $conn->query("SELECT id FROM users WHERE email='$email'");
+    if ($check->num_rows > 0) {
+        $error = "Email already registered!";
+    } else {
+        $otp = rand(100000, 999999);
+        $_SESSION['temp_otp'] = $otp;
+        $_SESSION['temp_email'] = $email;
+        $_SESSION['temp_user'] = $_POST['username'];
+        $_SESSION['temp_pass'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        
+        // Asli server par mail() function use karein.
+        // Localhost ke liye hum JS alert use karenge niche.
+        $otp_sent = true; 
+    }
+}
+
+// STEP 2: VERIFY OTP & CREATE ACCOUNT
+if (isset($_POST['verify_otp'])) {
+    $user_otp = $_POST['otp_code'];
+    
+    if ($user_otp == $_SESSION['temp_otp']) {
+        // Data Database mein daalo
+        $u = $_SESSION['temp_user'];
+        $e = $_SESSION['temp_email'];
+        $p = $_SESSION['temp_pass'];
+        
+        $sql = "INSERT INTO users (username, email, password) VALUES ('$u', '$e', '$p')";
+        if ($conn->query($sql)) {
+            // Cleanup session
+            unset($_SESSION['temp_otp']);
+            unset($_SESSION['temp_pass']);
+            
+            echo "<script>alert('Account Created! Login Now.'); window.location.href='login.php';</script>";
+        } else {
+            $error = "Database Error!";
+        }
+    } else {
+        $error = "Invalid OTP! Try again.";
+        $otp_sent = true; // Form wapas dikhane ke liye
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Signup</title>
+    <link rel="stylesheet" href="auth-style.css">
+</head>
+<body>
+
+<div class="auth-box">
+    <h2 class="glitch">JOIN THE ARMY</h2>
+
+    <?php if(isset($error)) echo "<p style='color:red'>$error</p>"; ?>
+
+    <?php if (!isset($otp_sent)): ?>
+    <form method="POST">
+        <div class="input-group">
+            <label>CODENAME</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="input-group">
+            <label>EMAIL</label>
+            <input type="email" name="email" required>
+        </div>
+        <div class="input-group">
+            <label>PASSWORD</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit" name="send_otp">SEND VERIFICATION CODE</button>
+    </form>
+    
+    <?php else: ?>
+    <div style="background:#111; padding:10px; border:1px solid #00ff41; margin-bottom:10px;">
+        <p style="color:#00ff41; font-size:12px;">OTP SENT TO: <?php echo $_SESSION['temp_email']; ?></p>
+    </div>
+    <form method="POST">
+        <div class="input-group">
+            <label>ENTER OTP CODE</label>
+            <input type="number" name="otp_code" placeholder="6 Digit Code" required>
+        </div>
+        <button type="submit" name="verify_otp">VERIFY & REGISTER</button>
+    </form>
+    
+    <script>
+        alert("DEMO OTP: <?php echo $_SESSION['temp_otp']; ?>");
+    </script>
+    <?php endif; ?>
+
+    <div class="auth-links">
+        Already an agent? <a href="login.php">Login Here</a>
+    </div>
+</div>
+
+<script src="auth.js"></script>
+</body>
+</html>

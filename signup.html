@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join The Army</title>
+    <link rel="stylesheet" href="auth-style.css">
+    <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<div class="auth-box">
+    <h2 id="signupTitle" class="glitch">Join The Army</h2>
+
+    <div class="input-group">
+        <label>CODENAME (USERNAME)</label>
+        <input type="text" placeholder="Choose Codename">
+    </div>
+
+    <div class="input-group">
+        <label>ENCRYPTED MAIL (EMAIL)</label>
+        <input type="email" placeholder="email@example.com">
+    </div>
+
+    <div class="input-group">
+        <label>ACCESS KEY (PASSWORD)</label>
+        <small id="strength" style="color:#00ff41;"></small>
+        <input type="password"
+       placeholder="Create Password"
+       onkeyup="checkStrength(this.value)">
+    </div>
+
+    <button onclick="loading(this, 'Sending OTP...')">
+    Send Verification Code
+</button>
+<div class="input-group">
+    <label>EMAIL VERIFICATION CODE</label>
+    <input type="text" placeholder="Enter OTP">
+</div>
+
+    <button onclick="loading(this, 'Verifying...')">
+    Verify & Signup
+</button>
+
+    <div class="auth-links">
+        Already an agent?
+        <a href="login.html">Login Here</a>
+    </div>
+</div>
+<script src="auth.js"></script>
+</body>
+</html>
+</body>
+</html>

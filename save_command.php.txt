@@ -1,0 +1,22 @@
+<?php
+include 'db_connect.php';
+session_start();
+
+// यहाँ चेक करें कि क्या यूजर एडमिन है (आपकी लॉगिन लॉजिक के अनुसार)
+if (!isset($_SESSION['admin_logged_in'])) {
+    die("Unauthorized Access!");
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = mysqli_real_escape_string($conn, $_POST['tool_name']);
+    $cmds = mysqli_real_escape_string($conn, $_POST['tool_commands']);
+
+    $sql = "INSERT INTO termux_tools (tool_name, tool_commands) VALUES ('$name', '$cmds')";
+    
+    if (mysqli_query($conn, $sql)) {
+        echo "<script>alert('Tool Added Successfully!'); window.location.href='admin.php';</script>";
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+?>

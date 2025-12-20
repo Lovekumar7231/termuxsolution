@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termux Hacking Family</title>
+<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+</head>
+
+<body onload="showSection('home')">
+
+  <header>
+  <div class="logo">Termux Hacking Family</div>
+  <div class="menu-icon" onclick="openNav()">☰</div>
+</header>
+
+<div id="mySidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  
+  <a onclick="showSection('home')">🏠 Home</a>
+  <a class="menu-item" onclick="showSection('commands')">
+    <span>⌨️ Commands</span>
+</a>
+
+  <a onclick="location.href='login.html'">🔑 Login</a>
+  <a onclick="location.href='signup.html'">📝 Signup</a>
+  <a onclick="showSection('about')">ℹ️ About</a>
+</div>
+
+
+<div class="container">
+
+<div id="home-section">
+  <h3>🔴 Live Hacking Class <span class="live-tag">LIVE</span></h3>
+
+  <div class="card">
+    <h4>Join Live Session</h4>
+    <button class="btn btn-prime" onclick="openLiveDashboard()">JOIN LIVE NOW</button>
+  </div>
+
+  <div class="card">
+    <h4>🎁 Free Membership</h4>
+    <p>Limited chat & announcements</p>
+    <button class="btn" onclick="location.href='login.html'">Join Free</button>
+
+  </div>
+
+  <div class="card prime-card-border">
+    <h4>👑 Prime Membership</h4>
+    <p>Full live + premium access</p>
+    <button class="btn btn-prime" onclick="showSection('prime')">View Prime</button>
+  </div>
+</div>
+
+<div id="prime-section" class="hidden-section" style="display:none; text-align:center;">
+    <h2 class="glitch" style="margin-top:20px; color:#ff0055;">CHOOSE YOUR PLAN</h2>
+  
+    <div class="card prime-card-border">
+        <p style="color:#ccc; margin-bottom:20px;">Unlock Full Live Access & Premium Tools</p>
+    
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            
+            <button class="btn btn-prime" onclick="location.href='payment.php?name=1 Month Prime&price=499'" style="border:1px solid #ff0055;">
+                1 Month Access - ₹499
+            </button>
+
+            <button class="btn btn-prime" onclick="location.href='payment.php?name=3 Months Prime&price=1099'" style="background:gold; color:black; font-weight:bold;">
+                3 Months Access - ₹1099 (BEST)
+            </button>
+
+            <button class="btn btn-prime" onclick="location.href='payment.php?name=6 Months Prime&price=2099'" style="border:1px solid #ff0055;">
+                6 Months Access - ₹2099
+            </button>
+
+        </div>
+
+        <button class="btn" onclick="showSection('home')" style="background:#333; color:#fff; margin-top:20px;">
+            ⬅ Back to Home
+        </button>
+    </div>
+</div>
+
+</div>
+
+<div id="commands-section" class="hidden-section" style="width: 100%; padding: 10px; box-sizing: border-box;">
+    
+    <h2 style="color: #00ff00; text-align: left; padding-left: 10px;">⌨️ Termux Tools</h2>
+
+    <div class="card" style="border: 1px solid #333; margin-bottom: 20px; padding: 15px;">
+        <input type="text" id="toolSearch" onkeyup="searchTools()" placeholder="🔍 Search tool name..." 
+        style="width: 100%; padding: 12px; border-radius: 5px; background: #1a1a1a; color: #00ff00; border: 1px solid #00ff00; box-sizing: border-box;">
+    </div>
+
+    <div id="tools-list-container">
+        </div>
+
+    <div id="admin-panel" class="card" style="border: 1px dashed #ff0066; margin-top: 20px; display: none; padding: 15px;">
+        <h3 style="color: #ff0066;">➕ Add New Tool</h3>
+        <input type="text" id="adminToolName" placeholder="Tool Name" style="width: 100%; margin-bottom: 10px; padding: 10px; background: #000; color: #fff; border: 1px solid #444;">
+        <textarea id="adminToolCmds" placeholder="Enter Commands" style="width: 100%; height: 80px; padding: 10px; background: #000; color: #0f0; border: 1px solid #444;"></textarea>
+        <button onclick="addNewTool()" style="background: #00ff00; color: #000; width: 100%; padding: 12px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer;">SAVE TO DIRECTORY</button>
+    </div>
+
+    <button class="btn" onclick="showSection('home')" style="...">BACK TO HOME</button>
+
+</div>
+
+<div id="about-section" class="hidden-section">
+  <div class="card">
+    <h3>About Us</h3>
+    <div class="about-links" style="margin: 20px 0; text-align: left;">
+    <p><i class="fab fa-telegram" style="color: #0088cc; width: 25px;"></i> <a href="https://t.me/Termuxcommandsi" target="_blank" style="color: #3399ff; text-decoration: none;">Telegram Channel</a></p>
+    <p><i class="fab fa-youtube" style="color: #ff0000; width: 25px;"></i> <a href="https://youtube.com/@termuxhacking0?si=6I6LxsPAw7qT6G4v" target="_blank" style="color: #3399ff; text-decoration: none;">YouTube</a></p>
+    <p><i class="fab fa-instagram" style="color: #e4405f; width: 25px;"></i> <a href="https://www.instagram.com/termux_solution?igsh=cGM2aTVlY2J6a2c2" target="_blank" style="color: #3399ff; text-decoration: none;">Instagram</a></p>
+    <p><i class="fab fa-facebook" style="color: #1877f2; width: 25px;"></i> <a href="https://www.facebook.com/share/17sb1SMUVn/" target="_blank" style="color: #3399ff; text-decoration: none;">Facebook Page</a></p>
+    <p><i class="fab fa-x-twitter" style="color: #ffffff; width: 25px;"></i> <a href="https://x.com/termux_solution?t=WhMbOlkhRfxPPLfzYJSQNQ&s=09" target="_blank" style="color: #3399ff; text-decoration: none;">X (Twitter)</a></p>
+    <p><i class="fab fa-tiktok" style="color: #ffffff; width: 25px;"></i> <a href="https://tiktok.com/@termux.solution" target="_blank" style="color: #3399ff; text-decoration: none;">TikTok</a></p>
+
+    <div id="mobile-box" style="background: #1a1a1a; padding: 12px; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between; margin-top: 15px;">
+        <span id="number-text" style="color: #888; font-family: monospace;">Mobile: +91 **********</span>
+        <button onclick="handleUnlock()" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">Unlock</button>
+    </div>
+</div>
+
+
+    <button class="btn" onclick="showSection('home')">Back Home</button>
+  </div>
+</div>
+
+</div>
+
+<div id="live-dashboard-section">
+  <div class="live-header">
+    <button onclick="closeLiveDashboard()" style="background:transparent; border:1px solid red; color:red; cursor:pointer;">⬅ Exit</button>
+    <span style="margin-left:10px; font-weight:bold;">LIVE WAR ROOM</span>
+  </div>
+
+  <div style="background: #000; height: 200px; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #00ff41;">
+    <div style="text-align: center;">
+        <div class="live-tag" style="display:inline-block; margin-bottom:10px;">LIVE</div>
+        <p style="color: #fff; font-size: 12px;">Waiting for host to share screen...</p>
+    </div>
+  </div>
+
+  <div id="chat-box"></div>
+
+  <div class="chat-input">
+    <input id="my-chat-msg" placeholder="Type message to hackers...">
+    <button onclick="sendChat()" style="background: #00ff41; border:none; padding: 0 15px; font-weight:bold;">SEND</button>
+  </div>
+</div>
+
+<div id="live-dashboard-section" style="display:none; position:fixed; inset:0; background:black; z-index:9999; flex-direction:column;">
+    
+    <div class="live-header" style="padding:10px; border-bottom:1px solid #00ff41; display:flex; justify-content:space-between; background:#111; height:50px; align-items:center;">
+        <span style="color:red; font-weight:bold; letter-spacing:1px;">● LIVE WAR ROOM</span>
+        <button onclick="closeLiveDashboard()" style="background:transparent; color:#00ff41; border:1px solid #00ff41; padding:5px 15px; cursor:pointer; font-family:monospace;">EXIT</button>
+    </div>
+
+    <div style="height:25%; background:#050505; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #333;">
+        <div style="text-align:center;">
+            <div style="color:red; animation:blink 1s infinite;">● LIVE FEED</div>
+            <h3 style="color:white; margin-top:5px;">WAITING FOR HOST...</h3>
+        </div>
+    </div>
+
+    <div id="chat-box" style="flex:1; overflow-y:auto; padding:15px; color:#ccc; font-family:monospace; background:#000;">
+        </div>
+
+    <div class="chat-input" style="padding:10px; background:#111; border-top:1px solid #00ff41; display:flex; height:70px; align-items:center;">
+        <input id="my-chat-msg" placeholder="Enter encrypted message..." style="flex:1; padding:12px; background:#000; border:1px solid #333; color:#00ff41; font-family:monospace; outline:none;">
+        <button onclick="sendChat()" style="background:#00ff41; color:black; font-weight:bold; border:none; padding:12px 25px; margin-left:10px; cursor:pointer; font-family:monospace;">SEND</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+-- Users Table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'user', -- 'admin' or 'user'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Orders Table (Purchases ke liye)
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    transaction_id VARCHAR(50) NOT NULL,
+    payment_status VARCHAR(20) DEFAULT 'completed',
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Note: Admin banane ke liye pehle normal signup karein, 
+-- fir phpMyAdmin mein jakar us user ka role 'user' se 'admin' kar dein.
+
+CREATE TABLE termux_tools (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tool_name VARCHAR(255) NOT NULL,
+    tool_commands TEXT NOT NULL
+);

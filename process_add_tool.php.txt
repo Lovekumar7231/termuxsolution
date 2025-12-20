@@ -1,0 +1,14 @@
+<?php
+include 'db_connect.php';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['tool_name'];
+    $cmds = $_POST['tool_commands'];
+
+    $sql = "INSERT INTO termux_tools (tool_name, tool_commands) VALUES ('$name', '$cmds')";
+    if (mysqli_query($conn, $sql)) {
+        header("Location: admin.php?success=1");
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+?>

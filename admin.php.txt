@@ -1,0 +1,89 @@
+<?php
+session_start();
+include 'db_connect.php';
+
+// 1. Security Check: Kya user Admin hai?
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    echo "<h1 style='color:red; text-align:center; margin-top:20%'>ACCESS DENIED: NOT AUTHORIZED</h1>";
+    exit(); // Code yahin rok do
+}
+
+// 2. Users ka data nikalo
+$users = $conn->query("SELECT * FROM users");
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Control Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { padding: 20px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #00ff41; padding: 10px; text-align: left; }
+        th { background: #111; color: #00ff41; }
+        td { color: #fff; }
+        h2 { border-bottom: 2px solid #00ff41; display: inline-block; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <h2 class="glitch">COMMAND CENTER (ADMIN)</h2>
+    <br>
+    <a href="index.php" class="btn" style="width:auto; display:inline-block; background:red; color:black;">EXIT PANEL</a>
+
+    <h3 style="margin-top:30px; text-align:left; color:#00ff41;">> DATABASE_USERS_LIST</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>CODENAME (Username)</th>
+                <th>EMAIL</th>
+                <th>ROLE</th>
+                <th>JOINED DATE</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while($row = $users->fetch_assoc()): ?>
+            <tr>
+                <td><?php echo $row['id']; ?></td>
+                <td><?php echo htmlspecialchars($row['username']); ?></td>
+                <td><?php echo htmlspecialchars($row['email']); ?></td>
+                <td style="color: <?php echo $row['role']=='admin' ? 'gold' : 'white'; ?>">
+                    <?php echo strtoupper($row['role']); ?>
+                </td>
+                <td><?php echo $row['created_at']; ?></td>
+            </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+
+<div class="card" style="border: 1px dashed #00ff00; padding: 20px; margin: 20px;">
+    <h3 style="color: #00ff00;">➕ Add New Termux Tool</h3>
+    <form action="process_add_tool.php" method="POST">
+        <input type="text" name="tool_name" placeholder="Tool Name" required style="width: 100%; margin-bottom: 10px; padding: 10px;">
+        <textarea name="tool_commands" placeholder="Enter Commands" required style="width: 100%; height: 100px; padding: 10px;"></textarea>
+        <button type="submit" style="background: #00ff00; width: 100%; padding: 15px; border: none; font-weight: bold;">SAVE TO WEBSITE</button>
+    </form>
+</div>
+
+<div class="card" style="border: 1px solid #ff0066; padding: 20px; margin: 20px; background: #121212;">
+    <h3 style="color: #00ff00;">➕ Add New Command</h3>
+    <form action="save_command.php" method="POST">
+        <input type="text" name="tool_name" placeholder="Tool Name (e.g., Nmap)" required 
+               style="width: 100%; padding: 12px; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #333;">
+        
+        <textarea name="tool_commands" placeholder="Enter Commands here..." required 
+                  style="width: 100%; height: 100px; padding: 12px; background: #000; color: #0f0; border: 1px solid #333; font-family: monospace;"></textarea>
+        
+        <button type="submit" style="background: #ff0066; color: white; width: 100%; padding: 15px; border: none; font-weight: bold; cursor: pointer; border-radius: 5px;">
+            SAVE TO DATABASE
+        </button>
+    </form>
+</div>
+
+
+</body>
+</html>

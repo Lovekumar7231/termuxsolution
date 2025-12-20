@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>System Access</title>
+    <link rel="stylesheet" href="auth-style.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<div class="auth-box">
+    <h2 id="loginTitle" class="glitch">System Access</h2>
+
+    <div class="input-group">
+        <label>CODENAME (USERNAME)</label>
+        <input type="text" id="usernameInput" placeholder="Enter Codename">
+    </div>
+
+    <div class="input-group">
+        <label>ACCESS KEY (PASSWORD)</label>
+        <input type="password" id="passwordInput" placeholder="Enter Password">
+    </div>
+
+    <p id="captchaQ" style="color: #00ff41; margin-bottom: 5px;"></p>
+    <div class="input-group">
+        <input id="captchaA" placeholder="Answer Math Logic">
+    </div>
+    
+    <script src="captcha.js"></script>
+    <script>loadCaptcha()</script>
+    
+    <button id="loginBtn" onclick="loading(this, 'Authenticating...')">Execute Login</button>
+
+    <div class="auth-links">
+        <a href="signup.html">Create Account</a> |
+        <a href="forgot_password.html">Forgot Password?</a>
+    </div>
+</div>
+
+<script src="auth.js"></script>
+
+</body>
+</html>

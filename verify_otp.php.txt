@@ -1,0 +1,25 @@
+<?php
+session_start();
+$data = json_decode(file_get_contents("php://input"), true);
+
+if (!isset($_SESSION['otp']) || time() - $_SESSION['otp_time'] > 300) {
+    die("OTP Expired");
+}
+
+if ($data['otp'] != $_SESSION['otp']) {
+    die("Invalid OTP");
+}
+
+$user = [
+  "username" => $data['username'],
+  "email" => $data['email'],
+  "password" => password_hash($data['password'], PASSWORD_DEFAULT)
+];
+
+$file = "users.json";
+$users = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+$users[] = $user;
+file_put_contents($file, json_encode($users, JSON_PRETTY_PRINT));
+
+unset($_SESSION['otp']);
+echo "Signup Success";

@@ -1,0 +1,199 @@
+<?php
+session_start();
+include 'db_connect.php';
+
+// Check karo user login hai ya nahi
+$isLoggedIn = isset($_SESSION['user_id']);
+$username = $isLoggedIn ? $_SESSION['username'] : "Guest";
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termux Hacking Family</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Termux Hacking Family</div>
+  <div class="menu-icon" onclick="openNav()">☰</div>
+</header>
+
+<div id="mySidebar" class="sidebar">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  
+  <div style="padding: 10px 25px; color: #00ff41; font-size: 14px;">
+      STATUS: <?php echo $isLoggedIn ? "ONLINE" : "OFFLINE"; ?><br>
+      AGENT: <?php echo htmlspecialchars($username); ?>
+  </div>
+  <hr style="border-color:#333">
+
+  <a href="index.php">🏠 Home</a>
+  
+  <?php if (!$isLoggedIn): ?>
+      <a href="login.php">🔑 Login</a>
+      <a href="signup.php">📝 Signup</a>
+  <?php else: ?>
+      <a href="#">👤 My Profile</a>
+      <a href="#">📦 My Purchases</a>
+      <a href="logout.php" style="color: #ff0055;">🚫 Logout</a>
+  <?php endif; ?>
+  
+  <a href="#">ℹ️ About</a>
+</div>
+
+<div class="container">
+    <div id="home-section">
+      <h3>🔴 Live Hacking Class <span class="live-tag">LIVE</span></h3>
+
+      <div class="card">
+        <h4>Join Live Session</h4>
+        <?php if ($isLoggedIn): ?>
+            <button class="btn btn-prime" onclick="openLiveDashboard()">JOIN LIVE NOW</button>
+        <?php else: ?>
+            <button class="btn" onclick="location.href='login.php'">LOGIN TO JOIN</button>
+        <?php endif; ?>
+      </div>
+
+      <div class="card">
+    <h4>🎁 Free Membership</h4>
+    <p>Limited chat & announcements</p>
+
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <button class="btn" style="background: #111; color: #00ff41; border: 1px solid #00ff41; cursor: default;">
+            ✅ ACTIVE MEMBER
+        </button>
+    <?php else: ?>
+        <button class="btn" onclick="location.href='signup.php'">
+            Join Free
+        </button>
+    <?php endif; ?>
+</div>
+
+
+      <div id="prime-section" class="hidden-section" style="display:none; text-align:center;">
+  
+  <h2 class="glitch" style="margin-top:20px; color:#ff0055;">CHOOSE YOUR PLAN</h2>
+  
+  <div class="card prime-card-border">
+    <p style="color:#ccc; margin-bottom:20px;">Unlock Full Live Access & Premium Tools</p>
+    
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+        
+        <button class="btn btn-prime" onclick="location.href='payment.php?name=1 Month Prime&price=499'" style="border:1px solid #ff0055;">
+            1 Month Access - ₹499
+        </button>
+
+        <button class="btn btn-prime" onclick="location.href='payment.php?name=3 Months Prime&price=1099'" style="background:gold; color:black; font-weight:bold;">
+            3 Months Access - ₹1099 (SAVE ₹400)
+        </button>
+
+        <button class="btn btn-prime" onclick="location.href='payment.php?name=6 Months Prime&price=2099'" style="border:1px solid #ff0055;">
+            6 Months Access - ₹2099
+        </button>
+
+    </div>
+
+    <button class="btn" onclick="showSection('home')" style="background:#333; color:#fff; margin-top:20px;">
+        ⬅ Back to Home
+    </button>
+  </div>
+</div>
+
+
+</div>
+
+<div id="live-dashboard-section" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:9999;">
+    
+    <div class="live-header" style="height:50px; display:flex; align-items:center; justify-content:space-between; padding:0 10px; background:#111; border-bottom:1px solid #00ff41;">
+        <span style="color:red; font-weight:bold;">● LIVE WAR ROOM</span>
+        <button onclick="closeLiveDashboard()" style="background:transparent; color:#00ff41; border:1px solid #00ff41; padding:5px 10px;">EXIT</button>
+    </div>
+
+    <div style="height:200px; background:#050505; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #333;">
+        <div style="text-align:center;">
+            <div style="color:red; animation:blink 1s infinite;">● LIVE FEED</div>
+            <p style="color:#666; font-size:12px;">Waiting for signal...</p>
+        </div>
+    </div>
+
+    <div id="chat-box" style="height: calc(100% - 320px); overflow-y: scroll; padding: 15px; padding-bottom: 80px; color:#ccc; font-family:monospace;">
+        </div>
+
+    <div class="chat-input" style="position:absolute; bottom:0; left:0; width:100%; height:70px; background:#111; border-top:1px solid #00ff41; display:flex; align-items:center; padding:10px; box-sizing:border-box;">
+        
+        <input id="my-chat-msg" placeholder="Type message..." style="flex:1; padding:10px; background:#000; border:1px solid #333; color:#00ff41; outline:none; height:40px;">
+        
+        <button onclick="sendChat()" style="background:#00ff41; color:black; border:none; padding:0 20px; margin-left:10px; height:40px; font-weight:bold;">SEND</button>
+    
+    </div>
+
+</div>
+
+  <div style="height:80vh; display:flex; align-items:center; justify-content:center;">
+      <h2 class="glitch">WAITING FOR HOST...</h2>
+  </div>
+</div>
+
+<div id="commands-section" class="hidden-section" style="width: 100%; padding: 10px;">
+    <h2 style="color: #00ff00; text-align: center;">⌨️ Termux Tools</h2>
+
+    <div class="card" style="border: 1px solid #333; padding: 15px; margin-bottom: 20px;">
+        <input type="text" id="toolSearch" onkeyup="searchTools()" placeholder="🔍 Search tool..." 
+        style="width: 100%; padding: 12px; background: #000; color: #00ff00; border: 1px solid #00ff00; border-radius: 5px;">
+    </div>
+
+    <div id="tools-container">
+        <?php
+        include 'db_connect.php'; // आपकी डेटाबेस फाइल
+        $result = mysqli_query($conn, "SELECT * FROM termux_tools");
+        while($row = mysqli_fetch_assoc($result)) {
+            echo '
+            <div class="card tool-card" style="border: 1px solid #ff0066; margin-bottom: 20px; padding: 20px; text-align: center;">
+                <h3 style="color: #00ff00; font-size: 22px;">👑 '.$row['tool_name'].'</h3>
+                <div id="cmds-'.$row['id'].'" style="display: none; background: #000; padding: 15px; border: 1px solid #333; color: #0f0; text-align: left; margin: 15px 0; font-family: monospace;">
+                    '.nl2br($row['tool_commands']).'
+                </div>
+                <button onclick="toggleTool('.$row['id'].')" style="background: #ff0066; color: white; width: 100%; padding: 12px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer;">
+                    VIEW COMMANDS
+                </button>
+            </div>';
+        }
+        ?>
+    </div>
+</div>
+
+<div id="tools-container">
+    <?php
+    $query = "SELECT * FROM termux_tools ORDER BY id DESC";
+    $res = mysqli_query($conn, $query);
+    while($row = mysqli_fetch_assoc($res)) {
+    ?>
+    <div class="card tool-card" style="border: 1px solid #ff0066; margin-bottom: 20px; padding: 20px; text-align: center;">
+        <h3 style="color: #00ff00; font-size: 22px;">📦 <?php echo $row['tool_name']; ?></h3>
+        
+        <div id="cmds-<?php echo $row['id']; ?>" style="display: none; background: #000; padding: 15px; border: 1px solid #333; color: #0f0; text-align: left; margin: 15px 0; font-family: monospace; white-space: pre-wrap;">
+            <?php echo $row['tool_commands']; ?>
+        </div>
+
+        <button onclick="toggleTool(<?php echo $row['id']; ?>)" style="background: #ff0066; color: white; width: 100%; padding: 12px; border: none; font-weight: bold; border-radius: 5px;">
+            VIEW COMMANDS
+        </button>
+    </div>
+    <?php } ?>
+</div>
+
+
+<script>
+function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
+function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
+function openLiveDashboard() { document.getElementById("live-dashboard-section").style.display = "block"; }
+function closeLiveDashboard() { document.getElementById("live-dashboard-section").style.display = "none"; }
+</script>
+
+</body>
+</html>
