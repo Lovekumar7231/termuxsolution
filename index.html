@@ -7,58 +7,43 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
-    /* Profile Logo Style */
+    /* Profile Icon Style */
     .profile-icon {
-        width: 40px; 
-        height: 40px; 
+        width: 35px; height: 35px; 
         border-radius: 50%; 
         border: 2px solid #00ff41; 
         cursor: pointer; 
-        background: #000;
         object-fit: cover;
+        background: #000;
     }
-    
-    /* Header Adjustment */
     header {
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        padding: 15px; 
-        background: #000; 
-        border-bottom: 1px solid #333;
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 15px; background: #000; border-bottom: 1px solid #333;
     }
-
-    .logo-area {
-        display: flex; 
-        align-items: center; 
-        gap: 10px;
-    }
+    .logo-area { display: flex; align-items: center; gap: 10px; }
 </style>
 </head>
 
-<body onload="showSection('home')">
+<body onload="checkLoginAndShowHome()">
 
-<header>
-  <div class="logo-area">
-    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
-         class="profile-icon" 
-         onclick="showSection('profile')">
-         
-    <div class="logo">Termux Hacking Family</div>
+  <header>
+    <div class="logo-area">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon" onclick="showSection('profile')">
+        <div class="logo">Termux Family</div>
+    </div>
+    <div class="menu-icon" onclick="openNav()" style="font-size:24px; cursor:pointer;">☰</div>
+  </header>
+
+  <div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <a onclick="showSection('profile')">👤 My Profile</a>
+    <a onclick="showSection('home')">🏠 Home</a>
+    <a onclick="showSection('commands')">⌨️ Commands</a>
+    <a href="login.html">🔑 Login</a>
+    <a href="signup.html">📝 Signup</a>
+    <a onclick="showSection('about')">ℹ️ About</a>
   </div>
-  
-  <div class="menu-icon" onclick="openNav()">☰</div>
-</header>
 
-<div id="mySidebar" class="sidebar">
-  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-  <a onclick="showSection('profile')">👤 My Profile</a>
-  <a onclick="showSection('home')">🏠 Home</a>
-  <a class="menu-item" onclick="showSection('commands')"><span>⌨️ Commands</span></a>
-  <a onclick="location.href='login.html'">🔑 Login</a>
-  <a onclick="location.href='signup.html'">📝 Signup</a>
-  <a onclick="showSection('about')">ℹ️ About</a>
-</div>
 
 <div class="container">
 
@@ -85,41 +70,40 @@
 
   <div id="profile-section" class="hidden-section" style="display:none; text-align:center; padding-top: 20px;">
     <h2 class="glitch" style="color:#00ff41; margin-bottom: 20px;">AGENT PROFILE</h2>
-    
-    <div class="card" style="border: 1px solid #00ff41; max-width: 350px; margin: auto; background: #111;">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width: 100px; margin-bottom: 15px; border: 3px solid #00ff41; border-radius: 50%;">
-        
-        <h3 id="profileName" style="color: white; text-transform: uppercase;">UNKNOWN AGENT</h3>
-        <p style="color: #888; font-size: 12px;">Rank: <span style="color: gold;">ELITE HACKER</span></p>
-        
-        <div style="margin-top: 20px; border-top: 1px dashed #333; padding-top: 15px; text-align: left;">
-            <p>🔴 Status: <span style="color:#00ff41;">Active</span></p>
-            <p>🆔 Agent ID: <span style="color:#ccc;">TMX-8829</span></p>
-            <p>📅 Joined: <span style="color:#ccc;">2025</span></p>
-        </div>
-
-        <button class="btn" onclick="logout()" style="background: #ff0055; color: white; margin-top: 25px; width: 100%;">LOGOUT SYSTEM</button>
-        <button class="btn" onclick="showSection('home')" style="margin-top: 10px; width: 100%;">BACK TO HOME</button>
+    <div class="card" style="border: 1px solid #00ff41; background: #111;">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width: 80px; margin-bottom: 15px; border: 2px solid #00ff41; border-radius: 50%;">
+        <h3 id="profileName" style="color: white; text-transform: uppercase;">GUEST USER</h3>
+        <p style="color: #888; font-size: 12px;">Status: <span style="color: gold;">ROOKIE</span></p>
+        <button class="btn" onclick="logout()" style="background: #ff0055; color: white; margin-top: 25px; width: 100%;">LOGOUT</button>
+        <button class="btn" onclick="showSection('home')" style="margin-top: 10px;">BACK HOME</button>
     </div>
   </div>
 
   <div id="prime-section" class="hidden-section" style="display:none; text-align:center;">
-      <h2 class="glitch" style="margin-top:20px; color:#ff0055;">CHOOSE YOUR PLAN</h2>
+      <h2 class="glitch" style="margin-top:20px; color:#ff0055;">CHOOSE PLAN</h2>
       <div class="card prime-card-border">
-          <p style="color:#ccc; margin-bottom:20px;">Unlock Full Live Access & Premium Tools</p>
           <div style="display: flex; flex-direction: column; gap: 15px;">
-              <button class="btn btn-prime">1 Month Access - ₹499</button>
-              <button class="btn btn-prime" style="background:gold; color:black;">3 Months Access - ₹1099</button>
-              <button class="btn btn-prime">6 Months Access - ₹2099</button>
+              <button class="btn btn-prime" onclick="location.href='payment.php?name=1 Month&price=499'">1 Month - ₹499</button>
+              <button class="btn btn-prime" style="background:gold; color:black;">3 Months - ₹1099</button>
+              <button class="btn btn-prime">6 Months - ₹2099</button>
           </div>
-          <button class="btn" onclick="showSection('home')" style="margin-top:20px;">⬅ Back to Home</button>
+          <button class="btn" onclick="showSection('home')" style="margin-top:20px;">⬅ Back</button>
       </div>
   </div>
 
-  <div id="commands-section" class="hidden-section" style="display:none;">
-      <h2 style="color: #00ff00;">⌨️ Termux Tools</h2>
-      <div class="card">
-          <input type="text" id="toolSearch" placeholder="🔍 Search tool name..." style="width: 100%; padding: 10px;">
+  <div id="commands-section" class="hidden-section" style="display:none; width: 100%; box-sizing: border-box;">
+      <h2 style="color: #00ff00; padding-left: 10px;">⌨️ Termux Tools</h2>
+      <div class="card" style="border: 1px solid #333; margin-bottom: 20px; padding: 15px;">
+          <input type="text" id="toolSearch" onkeyup="searchTools()" placeholder="🔍 Search tool name..." 
+          style="width: 100%; padding: 12px; border-radius: 5px; background: #1a1a1a; color: #00ff00; border: 1px solid #00ff00;">
+      </div>
+      <div id="tools-list-container"></div>
+      
+      <div id="admin-panel" class="card" style="border: 1px dashed #ff0066; margin-top: 20px; display: none; padding: 15px;">
+          <h3 style="color: #ff0066;">➕ Add New Tool</h3>
+          <input type="text" id="adminToolName" placeholder="Tool Name" style="width: 100%; margin-bottom: 10px; padding: 10px; background: #000; color: #fff; border: 1px solid #444;">
+          <textarea id="adminToolCmds" placeholder="Enter Commands" style="width: 100%; height: 80px; padding: 10px; background: #000; color: #0f0; border: 1px solid #444;"></textarea>
+          <button onclick="addNewTool()" style="background: #00ff00; color: #000; width: 100%; padding: 12px; border: none; font-weight: bold; cursor: pointer;">SAVE</button>
       </div>
       <button class="btn" onclick="showSection('home')">BACK TO HOME</button>
   </div>
@@ -127,7 +111,16 @@
   <div id="about-section" class="hidden-section" style="display:none;">
     <div class="card">
       <h3>About Us</h3>
-      <p>Termux Hacking Family - Learn Ethical Hacking</p>
+      <div class="about-links" style="margin: 20px 0; text-align: left;">
+        <p><i class="fab fa-telegram" style="color: #0088cc; width: 25px;"></i> <a href="https://t.me/Termuxcommandsi" style="color: #3399ff;">Telegram Channel</a></p>
+        <p><i class="fab fa-youtube" style="color: #ff0000; width: 25px;"></i> <a href="https://youtube.com/@termuxhacking0" style="color: #3399ff;">YouTube</a></p>
+        <p><i class="fab fa-instagram" style="color: #e4405f; width: 25px;"></i> <a href="https://www.instagram.com/termux_solution" style="color: #3399ff;">Instagram</a></p>
+        
+        <div id="mobile-box" style="background: #1a1a1a; padding: 12px; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between; margin-top: 15px;">
+            <span id="number-text" style="color: #888; font-family: monospace;">Mobile: +91 **********</span>
+            <button onclick="handleUnlock()" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer;">Unlock</button>
+        </div>
+      </div>
       <button class="btn" onclick="showSection('home')">Back Home</button>
     </div>
   </div>
@@ -137,95 +130,73 @@
 <div id="live-dashboard-section" style="display:none; position:fixed; inset:0; background:black; z-index:9999; flex-direction:column;">
     <div class="live-header" style="padding:10px; border-bottom:1px solid #00ff41; display:flex; justify-content:space-between; background:#111; height:50px; align-items:center;">
         <span style="color:red; font-weight:bold;">● LIVE WAR ROOM</span>
-        <button onclick="closeLiveDashboard()" style="background:transparent; color:#00ff41; border:1px solid #00ff41;">EXIT</button>
+        <button onclick="closeLiveDashboard()" style="border:1px solid #00ff41; background:transparent; color:#00ff41; padding:5px 15px;">EXIT</button>
     </div>
-    <div style="flex:1; display:flex; justify-content:center; align-items:center;">
-        <h3 style="color:white;">WAITING FOR HOST...</h3>
+    <div style="height:25%; background:#050505; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #333;">
+        <div style="text-align:center;">
+            <div style="color:red; animation:blink 1s infinite;">● LIVE FEED</div>
+            <h3 style="color:white; margin-top:5px;">WAITING FOR HOST...</h3>
+        </div>
+    </div>
+    <div id="chat-box" style="flex:1; overflow-y:auto; padding:15px; color:#ccc; font-family:monospace;"></div>
+    <div class="chat-input" style="padding:10px; background:#111; border-top:1px solid #00ff41; display:flex;">
+        <input id="my-chat-msg" placeholder="Message..." style="flex:1; padding:10px; background:#000; border:1px solid #333; color:#00ff41;">
+        <button onclick="sendChat()" style="background:#00ff41; border:none; padding:0 20px; font-weight:bold; margin-left:10px;">SEND</button>
     </div>
 </div>
 
 <script src="script.js"></script>
+
 <script>
-    // Internal Script for Profile & Section Logic
-    
-    // Check Login Name
-    document.addEventListener("DOMContentLoaded", function() {
-        const agentName = localStorage.getItem("agentName");
-        if(agentName) {
-            document.getElementById("profileName").innerText = "AGENT " + agentName;
+    function checkLoginAndShowHome() {
+        showSection('home');
+        const name = localStorage.getItem("agentName");
+        if(name) {
+            document.getElementById("profileName").innerText = "AGENT " + name;
+            // Join Free button update
+            const freeBtn = document.getElementById("freeJoinBtn");
+            if(freeBtn) {
+                freeBtn.innerText = "ACTIVE ✅";
+                freeBtn.style.color = "#00ff41";
+            }
         }
-    });
+    }
 
-    // Section Switching Logic
     function showSection(sectionId) {
-        // Hide all sections
-        const sections = document.querySelectorAll('.hidden-section');
-        sections.forEach(sec => sec.style.display = 'none');
-
-        // Show selected section
+        document.querySelectorAll('.hidden-section').forEach(sec => sec.style.display = 'none');
         const target = document.getElementById(sectionId + '-section');
-        if(target) {
-            target.style.display = 'block';
-        }
-        closeNav(); // Close sidebar if open
+        if(target) target.style.display = 'block';
+        closeNav();
     }
+    
+    function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
+    function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
 
-    function openNav() {
-        document.getElementById("mySidebar").style.width = "250px";
-    }
+    function openLiveDashboard() { document.getElementById('live-dashboard-section').style.display = 'flex'; }
+    function closeLiveDashboard() { document.getElementById('live-dashboard-section').style.display = 'none'; }
 
-    function closeNav() {
-        document.getElementById("mySidebar").style.width = "0";
-    }
-
-    function openLiveDashboard() {
-        document.getElementById('live-dashboard-section').style.display = 'flex';
-    }
-
-    function closeLiveDashboard() {
-        document.getElementById('live-dashboard-section').style.display = 'none';
+    function checkFreeMembership() {
+        if(localStorage.getItem("agentName")) alert("✅ You are already joined!");
+        else location.href = "login.html";
     }
 
     function logout() {
-        if(confirm("Are you sure you want to logout?")) {
-            localStorage.removeItem("agentName");
-            localStorage.removeItem("agentPass");
-            window.location.href = "login.html";
+        localStorage.removeItem("agentName");
+        localStorage.removeItem("agentPass");
+        location.href = "login.html";
+    }
+
+    // Unlock Mobile Logic
+    function handleUnlock() {
+        if(localStorage.getItem("agentName")) {
+            document.getElementById("number-text").innerText = "Mobile: +91 96644 14840";
+            document.getElementById("number-text").style.color = "#00ff41";
+        } else {
+            alert("🔒 Login first to see the number!");
+            location.href = "login.html";
         }
     }
 </script>
-
-    <script>
-    // पेज लोड होते ही चेक करें कि लॉगिन है या नहीं
-    document.addEventListener("DOMContentLoaded", function() {
-        const agentName = localStorage.getItem("agentName");
-        
-        // अगर लॉगिन है, तो बटन का रंग और टेक्स्ट बदल दें
-        if(agentName) {
-            const btn = document.getElementById("freeJoinBtn");
-            if(btn) {
-                btn.innerText = "ACTIVE ✅";
-                btn.style.background = "#1a1a1a";
-                btn.style.border = "1px solid #00ff41";
-                btn.style.color = "#00ff41";
-            }
-        }
-    });
-
-    // बटन दबाने पर क्या होगा
-    function checkFreeMembership() {
-        const agentName = localStorage.getItem("agentName");
-        
-        if (agentName) {
-            // अगर लॉगिन है
-            alert("✅ You are already a verified Agent: " + agentName + "\nAccess Granted!");
-        } else {
-            // अगर लॉगिन नहीं है
-            window.location.href = "login.html";
-        }
-    }
-    </script>
-    
 
 </body>
 </html>
