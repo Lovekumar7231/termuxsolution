@@ -73,7 +73,7 @@
     <div class="card">
       <h4>🎁 Free Membership</h4>
       <p>Limited chat & announcements</p>
-      <button class="btn" onclick="location.href='login.html'">Join Free</button>
+      <button class="btn" id="freeJoinBtn" onclick="checkFreeMembership()">Join Free</button>
     </div>
 
     <div class="card prime-card-border">
@@ -194,6 +194,38 @@
         }
     }
 </script>
+
+    <script>
+    // पेज लोड होते ही चेक करें कि लॉगिन है या नहीं
+    document.addEventListener("DOMContentLoaded", function() {
+        const agentName = localStorage.getItem("agentName");
+        
+        // अगर लॉगिन है, तो बटन का रंग और टेक्स्ट बदल दें
+        if(agentName) {
+            const btn = document.getElementById("freeJoinBtn");
+            if(btn) {
+                btn.innerText = "ACTIVE ✅";
+                btn.style.background = "#1a1a1a";
+                btn.style.border = "1px solid #00ff41";
+                btn.style.color = "#00ff41";
+            }
+        }
+    });
+
+    // बटन दबाने पर क्या होगा
+    function checkFreeMembership() {
+        const agentName = localStorage.getItem("agentName");
+        
+        if (agentName) {
+            // अगर लॉगिन है
+            alert("✅ You are already a verified Agent: " + agentName + "\nAccess Granted!");
+        } else {
+            // अगर लॉगिन नहीं है
+            window.location.href = "login.html";
+        }
+    }
+    </script>
+    
 
 </body>
 </html>
