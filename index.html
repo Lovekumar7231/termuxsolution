@@ -7,9 +7,9 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
-    /* Profile Icon Style */
-    .profile-icon {
-        width: 35px; height: 35px; 
+    /* Header Profile Icon */
+    .profile-icon-header {
+        width: 40px; height: 40px; 
         border-radius: 50%; 
         border: 2px solid #00ff41; 
         cursor: pointer; 
@@ -21,14 +21,40 @@
         padding: 10px 15px; background: #000; border-bottom: 1px solid #333;
     }
     .logo-area { display: flex; align-items: center; gap: 10px; }
+
+    /* Active User Box (Home Page) */
+    .active-user-box {
+        background: #0a290a;
+        border: 1px solid #00ff41;
+        padding: 10px;
+        border-radius: 5px;
+        color: #00ff41;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 10px;
+        box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+    }
+    
+    /* Profile Inputs */
+    .profile-input {
+        width: 95%;
+        padding: 10px;
+        margin: 5px 0 15px 0;
+        background: #222;
+        border: 1px solid #444;
+        color: white;
+        border-radius: 4px;
+        outline: none;
+    }
+    .profile-input:focus { border-color: #00ff41; }
 </style>
 </head>
 
-<body onload="checkLoginAndShowHome()">
+<body onload="checkGlobalLoginState()">
 
   <header>
     <div class="logo-area">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon" onclick="showSection('profile')">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon-header" id="headerProfileImg" onclick="showSection('profile')">
         <div class="logo">Termux Family</div>
     </div>
     <div class="menu-icon" onclick="openNav()" style="font-size:24px; cursor:pointer;">☰</div>
@@ -36,12 +62,20 @@
 
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a onclick="showSection('profile')">👤 My Profile</a>
+    
     <a onclick="showSection('home')">🏠 Home</a>
+    <a onclick="showSection('profile')">👤 My Profile</a>
     <a onclick="showSection('commands')">⌨️ Commands</a>
-    <a href="login.html">🔑 Login</a>
-    <a href="signup.html">📝 Signup</a>
     <a onclick="showSection('about')">ℹ️ About</a>
+    
+    <div id="loggedOutLinks">
+        <a href="login.html" style="color: gold;">🔑 Login</a>
+        <a href="signup.html" style="color: gold;">📝 Signup</a>
+    </div>
+
+    <div id="loggedInLinks" style="display:none;">
+        <a onclick="logout()" style="color: #ff0055; font-weight:bold; border-top:1px solid #333;">🚪 Logout System</a>
+    </div>
   </div>
 
 
@@ -58,7 +92,13 @@
     <div class="card">
       <h4>🎁 Free Membership</h4>
       <p>Limited chat & announcements</p>
-      <button class="btn" id="freeJoinBtn" onclick="checkFreeMembership()">Join Free</button>
+      
+      <button class="btn" id="freeJoinBtn" onclick="location.href='login.html'">Login to Join</button>
+      
+      <div id="activeUserDisplay" class="active-user-box" style="display:none;">
+          Verified Agent: <span id="homeAgentName"></span> ✅<br>
+          <span style="font-size:12px; color:#ccc;">Status: Active</span>
+      </div>
     </div>
 
     <div class="card prime-card-border">
@@ -70,12 +110,29 @@
 
   <div id="profile-section" class="hidden-section" style="display:none; text-align:center; padding-top: 20px;">
     <h2 class="glitch" style="color:#00ff41; margin-bottom: 20px;">AGENT PROFILE</h2>
-    <div class="card" style="border: 1px solid #00ff41; background: #111;">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width: 80px; margin-bottom: 15px; border: 2px solid #00ff41; border-radius: 50%;">
-        <h3 id="profileName" style="color: white; text-transform: uppercase;">GUEST USER</h3>
-        <p style="color: #888; font-size: 12px;">Status: <span style="color: gold;">ROOKIE</span></p>
-        <button class="btn" onclick="logout()" style="background: #ff0055; color: white; margin-top: 25px; width: 100%;">LOGOUT</button>
-        <button class="btn" onclick="showSection('home')" style="margin-top: 10px;">BACK HOME</button>
+    <div class="card" style="border: 1px solid #00ff41; background: #111; max-width: 400px; margin: auto;">
+        
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" id="mainProfileImg" style="width: 100px; height: 100px; margin-bottom: 15px; border: 3px solid #00ff41; border-radius: 50%; object-fit: cover;">
+        
+        <h3 id="profileNameDisplay" style="color: white; text-transform: uppercase;">GUEST USER</h3>
+        <p style="color: #888;">Status: <span style="color: gold;">ROOKIE</span> | DD: <span id="profileDDDisplay">--/--</span></p>
+        
+        <div style="margin-top: 20px; border-top: 1px dashed #333; padding-top: 15px; text-align: left;">
+            <h4 style="color: #00ff41;">🛠 Update Profile:</h4>
+            
+            <label style="color:#888; font-size:12px;">Codename:</label>
+            <input type="text" id="editName" class="profile-input" placeholder="Change Name">
+            
+            <label style="color:#888; font-size:12px;">Date of Birth (DD/MM):</label>
+            <input type="text" id="editDD" class="profile-input" placeholder="e.g. 15/08">
+            
+            <label style="color:#888; font-size:12px;">Upload Photo (From Gallery):</label>
+            <input type="file" id="fileInput" accept="image/*" style="background: #333; color: white; padding: 10px; width: 95%; border-radius: 5px;">
+            
+            <button onclick="saveProfileData()" class="btn" style="background: #00ff41; color: black; width: 100%; margin-top: 15px; font-weight: bold;">SAVE CHANGES</button>
+        </div>
+
+        <button class="btn" onclick="showSection('home')" style="margin-top: 20px;">BACK HOME</button>
     </div>
   </div>
 
@@ -83,7 +140,7 @@
       <h2 class="glitch" style="margin-top:20px; color:#ff0055;">CHOOSE PLAN</h2>
       <div class="card prime-card-border">
           <div style="display: flex; flex-direction: column; gap: 15px;">
-              <button class="btn btn-prime" onclick="location.href='payment.php?name=1 Month&price=499'">1 Month - ₹499</button>
+              <button class="btn btn-prime">1 Month - ₹499</button>
               <button class="btn btn-prime" style="background:gold; color:black;">3 Months - ₹1099</button>
               <button class="btn btn-prime">6 Months - ₹2099</button>
           </div>
@@ -91,34 +148,28 @@
       </div>
   </div>
 
-  <div id="commands-section" class="hidden-section" style="display:none; width: 100%; box-sizing: border-box;">
-      <h2 style="color: #00ff00; padding-left: 10px;">⌨️ Termux Tools</h2>
-      <div class="card" style="border: 1px solid #333; margin-bottom: 20px; padding: 15px;">
-          <input type="text" id="toolSearch" onkeyup="searchTools()" placeholder="🔍 Search tool name..." 
-          style="width: 100%; padding: 12px; border-radius: 5px; background: #1a1a1a; color: #00ff00; border: 1px solid #00ff00;">
+  <div id="commands-section" class="hidden-section" style="display:none;">
+      <h2 style="color: #00ff00;">⌨️ Termux Tools</h2>
+      <div class="card">
+          <input type="text" placeholder="🔍 Search tool name..." style="width: 100%; padding: 12px; background: #1a1a1a; color: #00ff00; border: 1px solid #00ff00;">
       </div>
-      <div id="tools-list-container"></div>
-      
-      <div id="admin-panel" class="card" style="border: 1px dashed #ff0066; margin-top: 20px; display: none; padding: 15px;">
-          <h3 style="color: #ff0066;">➕ Add New Tool</h3>
-          <input type="text" id="adminToolName" placeholder="Tool Name" style="width: 100%; margin-bottom: 10px; padding: 10px; background: #000; color: #fff; border: 1px solid #444;">
-          <textarea id="adminToolCmds" placeholder="Enter Commands" style="width: 100%; height: 80px; padding: 10px; background: #000; color: #0f0; border: 1px solid #444;"></textarea>
-          <button onclick="addNewTool()" style="background: #00ff00; color: #000; width: 100%; padding: 12px; border: none; font-weight: bold; cursor: pointer;">SAVE</button>
-      </div>
-      <button class="btn" onclick="showSection('home')">BACK TO HOME</button>
+      <p style="color:#666; text-align:center; margin-top:20px;">(Tools list loading...)</p>
+      <button class="btn" onclick="showSection('home')" style="margin-top:20px;">BACK TO HOME</button>
   </div>
 
   <div id="about-section" class="hidden-section" style="display:none;">
     <div class="card">
       <h3>About Us</h3>
       <div class="about-links" style="margin: 20px 0; text-align: left;">
-        <p><i class="fab fa-telegram" style="color: #0088cc; width: 25px;"></i> <a href="https://t.me/Termuxcommandsi" style="color: #3399ff;">Telegram Channel</a></p>
-        <p><i class="fab fa-youtube" style="color: #ff0000; width: 25px;"></i> <a href="https://youtube.com/@termuxhacking0" style="color: #3399ff;">YouTube</a></p>
-        <p><i class="fab fa-instagram" style="color: #e4405f; width: 25px;"></i> <a href="https://www.instagram.com/termux_solution" style="color: #3399ff;">Instagram</a></p>
+        <p><i class="fab fa-telegram" style="color: #0088cc; width: 30px;"></i> <a href="https://t.me/Termuxcommandsi" style="color: #3399ff;">Telegram Channel</a></p>
+        <p><i class="fab fa-youtube" style="color: #ff0000; width: 30px;"></i> <a href="https://youtube.com/@termuxhacking0" style="color: #3399ff;">YouTube</a></p>
+        <p><i class="fab fa-instagram" style="color: #e4405f; width: 30px;"></i> <a href="https://www.instagram.com/termux_solution" style="color: #3399ff;">Instagram</a></p>
+        <p><i class="fab fa-facebook" style="color: #1877F2; width: 30px;"></i> <a href="#" style="color: #3399ff;">Facebook Page</a></p>
+        <p><i class="fab fa-x-twitter" style="color: #ffffff; width: 30px;"></i> <a href="#" style="color: #3399ff;">X (Twitter)</a></p>
         
-        <div id="mobile-box" style="background: #1a1a1a; padding: 12px; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: space-between; margin-top: 15px;">
-            <span id="number-text" style="color: #888; font-family: monospace;">Mobile: +91 **********</span>
-            <button onclick="handleUnlock()" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer;">Unlock</button>
+        <div id="mobile-box" style="background: #1a1a1a; padding: 12px; margin-top: 15px; border-radius: 8px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+            <span id="number-text" style="color: #888;">Mobile: +91 **********</span>
+            <button onclick="handleUnlock()" style="background: #28a745; border: none; padding: 5px 10px; color: white; border-radius: 5px; cursor: pointer;">Unlock</button>
         </div>
       </div>
       <button class="btn" onclick="showSection('home')">Back Home</button>
@@ -128,41 +179,109 @@
 </div>
 
 <div id="live-dashboard-section" style="display:none; position:fixed; inset:0; background:black; z-index:9999; flex-direction:column;">
-    <div class="live-header" style="padding:10px; border-bottom:1px solid #00ff41; display:flex; justify-content:space-between; background:#111; height:50px; align-items:center;">
+    <div style="padding:15px; border-bottom:1px solid #00ff41; display:flex; justify-content:space-between; background:#111;">
         <span style="color:red; font-weight:bold;">● LIVE WAR ROOM</span>
-        <button onclick="closeLiveDashboard()" style="border:1px solid #00ff41; background:transparent; color:#00ff41; padding:5px 15px;">EXIT</button>
+        <button onclick="closeLiveDashboard()" style="background:transparent; color:#00ff41; border:1px solid #00ff41; padding:5px 10px;">EXIT</button>
     </div>
-    <div style="height:25%; background:#050505; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #333;">
-        <div style="text-align:center;">
-            <div style="color:red; animation:blink 1s infinite;">● LIVE FEED</div>
-            <h3 style="color:white; margin-top:5px;">WAITING FOR HOST...</h3>
-        </div>
-    </div>
-    <div id="chat-box" style="flex:1; overflow-y:auto; padding:15px; color:#ccc; font-family:monospace;"></div>
-    <div class="chat-input" style="padding:10px; background:#111; border-top:1px solid #00ff41; display:flex;">
-        <input id="my-chat-msg" placeholder="Message..." style="flex:1; padding:10px; background:#000; border:1px solid #333; color:#00ff41;">
-        <button onclick="sendChat()" style="background:#00ff41; border:none; padding:0 20px; font-weight:bold; margin-left:10px;">SEND</button>
+    <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+        <h3 style="color:white;">WAITING FOR HOST...</h3>
     </div>
 </div>
 
 <script src="script.js"></script>
 
 <script>
-    function checkLoginAndShowHome() {
-        showSection('home');
-        const name = localStorage.getItem("agentName");
-        if(name) {
-            document.getElementById("profileName").innerText = "AGENT " + name;
-            // Join Free button update
-            const freeBtn = document.getElementById("freeJoinBtn");
-            if(freeBtn) {
-                freeBtn.innerText = "ACTIVE ✅";
-                freeBtn.style.color = "#00ff41";
+    // --- MASTER LOGIC ---
+
+    // 1. Check Login on Load
+    function checkGlobalLoginState() {
+        showSection('home'); // Default section
+        
+        const agentName = localStorage.getItem("agentName");
+        const agentPhoto = localStorage.getItem("agentPhoto");
+        const agentDD = localStorage.getItem("agentDD");
+
+        if (agentName) {
+            // USER IS LOGGED IN
+            document.getElementById("loggedOutLinks").style.display = "none";
+            document.getElementById("loggedInLinks").style.display = "block";
+            
+            // Update Home
+            document.getElementById("freeJoinBtn").style.display = "none";
+            document.getElementById("activeUserDisplay").style.display = "block";
+            document.getElementById("homeAgentName").innerText = agentName;
+
+            // Update Profile Info
+            document.getElementById("profileNameDisplay").innerText = "AGENT " + agentName;
+            document.getElementById("editName").value = agentName;
+            
+            if(agentDD) {
+                document.getElementById("profileDDDisplay").innerText = agentDD;
+                document.getElementById("editDD").value = agentDD;
             }
+
+            // Update Photo (Header & Profile)
+            if (agentPhoto) {
+                document.getElementById("headerProfileImg").src = agentPhoto;
+                document.getElementById("mainProfileImg").src = agentPhoto;
+            }
+
+        } else {
+            // USER IS GUEST
+            document.getElementById("loggedOutLinks").style.display = "block";
+            document.getElementById("loggedInLinks").style.display = "none";
+            document.getElementById("freeJoinBtn").style.display = "inline-block";
+            document.getElementById("activeUserDisplay").style.display = "none";
         }
     }
 
+    // 2. Save Profile (With Gallery Upload)
+    function saveProfileData() {
+        if(!localStorage.getItem("agentName")) {
+            alert("⚠️ Please Login first!");
+            location.href = "login.html";
+            return;
+        }
+
+        const newName = document.getElementById("editName").value;
+        const newDD = document.getElementById("editDD").value;
+        const fileInput = document.getElementById("fileInput");
+
+        // Save Text Data
+        if(newName) localStorage.setItem("agentName", newName);
+        if(newDD) localStorage.setItem("agentDD", newDD);
+
+        // Save Image Data (from Gallery)
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function (e) {
+                const base64Img = e.target.result;
+                localStorage.setItem("agentPhoto", base64Img); // Save to phone memory
+                
+                // Update UI Immediately
+                document.getElementById("mainProfileImg").src = base64Img;
+                document.getElementById("headerProfileImg").src = base64Img;
+                
+                // Update text UI logic
+                checkGlobalLoginState(); 
+                alert("✅ Photo & Details Updated!");
+            };
+            
+            reader.readAsDataURL(fileInput.files[0]); // Read file
+        } else {
+            checkGlobalLoginState();
+            alert("✅ Details Updated (No new photo selected).");
+        }
+    }
+
+    // 3. Navigation & Utilities
     function showSection(sectionId) {
+        if(sectionId === 'profile' && !localStorage.getItem("agentName")) {
+            alert("🔒 Login Required for Profile!");
+            location.href = "login.html";
+            return;
+        }
         document.querySelectorAll('.hidden-section').forEach(sec => sec.style.display = 'none');
         const target = document.getElementById(sectionId + '-section');
         if(target) target.style.display = 'block';
@@ -171,28 +290,22 @@
     
     function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
     function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
-
     function openLiveDashboard() { document.getElementById('live-dashboard-section').style.display = 'flex'; }
     function closeLiveDashboard() { document.getElementById('live-dashboard-section').style.display = 'none'; }
 
-    function checkFreeMembership() {
-        if(localStorage.getItem("agentName")) alert("✅ You are already joined!");
-        else location.href = "login.html";
-    }
-
     function logout() {
-        localStorage.removeItem("agentName");
-        localStorage.removeItem("agentPass");
-        location.href = "login.html";
+        if(confirm("Logout from System?")) {
+            localStorage.clear(); // Clear all data
+            location.href = "login.html";
+        }
     }
 
-    // Unlock Mobile Logic
     function handleUnlock() {
         if(localStorage.getItem("agentName")) {
             document.getElementById("number-text").innerText = "Mobile: +91 96644 14840";
             document.getElementById("number-text").style.color = "#00ff41";
         } else {
-            alert("🔒 Login first to see the number!");
+            alert("🔒 Login first to see number!");
             location.href = "login.html";
         }
     }
@@ -200,3 +313,4 @@
 
 </body>
 </html>
+
