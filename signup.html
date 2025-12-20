@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join The Army</title>
     <link rel="stylesheet" href="auth-style.css">
-    <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -26,22 +26,21 @@
     <div class="input-group">
         <label>ACCESS KEY (PASSWORD)</label>
         <small id="strength" style="color:#00ff41;"></small>
-        <input type="password"
-       placeholder="Create Password"
-       onkeyup="checkStrength(this.value)">
+        <input type="password" placeholder="Create Password" onkeyup="checkStrength(this.value)">
     </div>
 
     <button onclick="loading(this, 'Sending OTP...')">
-    Send Verification Code
-</button>
-<div class="input-group">
-    <label>EMAIL VERIFICATION CODE</label>
-    <input type="text" placeholder="Enter OTP">
-</div>
+        Send Verification Code
+    </button>
+    
+    <div class="input-group">
+        <label>EMAIL VERIFICATION CODE</label>
+        <input type="text" placeholder="Enter OTP">
+    </div>
 
     <button onclick="loading(this, 'Verifying...')">
-    Verify & Signup
-</button>
+        Verify & Signup
+    </button>
 
     <div class="auth-links">
         Already an agent?
@@ -51,5 +50,4 @@
 <script src="auth.js"></script>
 </body>
 </html>
-</body>
-</html>
+
