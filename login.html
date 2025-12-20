@@ -5,6 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Access</title>
     <link rel="stylesheet" href="auth-style.css">
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
+            authDomain: "termuxhacking-aac55.firebaseapp.com",
+            projectId: "termuxhacking-aac55",
+            storageBucket: "termuxhacking-aac55.firebasestorage.app",
+            messagingSenderId: "921781091312",
+            appId: "1:921781091312:web:39a1b96ceda5bc60b83b35",
+            measurementId: "G-K8SFF8YMPB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        // लॉगिन फंक्शन को window ऑब्जेक्ट में डालें ताकि बटन इसे बुला सके
+        window.firebaseLogin = function(username, password) {
+            const dbRef = ref(db);
+            get(child(dbRef, `users/${username}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    if (userData.password === password) {
+                        alert("✅ ACCESS GRANTED! Welcome Agent " + username);
+                        // लॉगिन सफल - वेबसाइट पर भेजें
+                        window.location.href = "https://www.google.com"; 
+                    } else {
+                        alert("🚫 ACCESS DENIED: Wrong Password!");
+                    }
+                } else {
+                    alert("❌ User not found! Please Signup first.");
+                }
+            }).catch((error) => {
+                alert("Server Error: " + error);
+            });
+        };
+    </script>
 </head>
 <body>
 
@@ -52,16 +91,12 @@
             return;
         }
 
-        // 2. Saved Password Check (From Signup)
-        const savedUser = localStorage.getItem("agentName");
-        const savedPass = localStorage.getItem("agentPass");
-
-        if (enteredUser === savedUser && enteredPass === savedPass) {
-            alert("✅ ACCESS GRANTED! Welcome Agent " + enteredUser);
-            // यहाँ अपनी मेन वेबसाइट का लिंक डालें (अभी Google पर भेज रहा हूँ)
-            window.location.href = "https://www.google.com"; 
+        // 2. Firebase Login Call
+        if (window.firebaseLogin) {
+            document.querySelector("button").innerText = "Authenticating...";
+            window.firebaseLogin(enteredUser, enteredPass);
         } else {
-            alert("❌ ACCESS DENIED: Invalid Username or Password!\n(Did you Signup first?)");
+            alert("Connecting to Database... Try again in 2 seconds.");
         }
     }
 </script>
