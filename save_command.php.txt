@@ -2,19 +2,21 @@
 include 'db_connect.php';
 session_start();
 
-// यहाँ चेक करें कि क्या यूजर एडमिन है (आपकी लॉगिन लॉजिक के अनुसार)
-if (!isset($_SESSION['admin_logged_in'])) {
-    die("Unauthorized Access!");
+// Admin Security Check
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    die("❌ ACCESS DENIED: Only Admin can upload tools.");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = mysqli_real_escape_string($conn, $_POST['tool_name']);
     $cmds = mysqli_real_escape_string($conn, $_POST['tool_commands']);
+    $img = mysqli_real_escape_string($conn, $_POST['tool_img']);
+    $video = mysqli_real_escape_string($conn, $_POST['tool_video']);
 
-    $sql = "INSERT INTO termux_tools (tool_name, tool_commands) VALUES ('$name', '$cmds')";
-    
+    $sql = "INSERT INTO termux_tools (tool_name, tool_commands, tool_img, tool_video) VALUES ('$name', '$cmds', '$img', '$video')";
+
     if (mysqli_query($conn, $sql)) {
-        echo "<script>alert('Tool Added Successfully!'); window.location.href='admin.php';</script>";
+        echo "<script>alert('✅ Tool Uploaded Successfully!'); window.location.href='index.php';</script>";
     } else {
         echo "Error: " . mysqli_error($conn);
     }
