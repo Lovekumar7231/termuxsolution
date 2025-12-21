@@ -5,97 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Access</title>
     <link rel="stylesheet" href="auth-style.css">
-    
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
-            authDomain: "termuxhacking-aac55.firebaseapp.com",
-            projectId: "termuxhacking-aac55",
-            storageBucket: "termuxhacking-aac55.firebasestorage.app",
-            messagingSenderId: "921781091312",
-            appId: "1:921781091312:web:39a1b96ceda5bc60b83b35",
-            measurementId: "G-K8SFF8YMPB"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        
-        window.firebaseLogin = function(username, password) {
-            
-            // 👇 ADMIN LOGIN (HARDCODED)
-            if (username === "Admin" && password === "Love@728296#$") {
-                alert("⚠️ WELCOME COMMANDER! SYSTEM UNLOCKED.");
-                
-                // Admin Status Set करें
-                localStorage.setItem("agentName", "COMMANDER");
-                localStorage.setItem("isAdmin", "true"); 
-                
-                window.location.href = "index.html"; 
-                return;
-            }
-
-            // 👇 REGULAR USER LOGIN
-            const dbRef = ref(db);
-            get(child(dbRef, `users/${username}`)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    if (userData.password === password) {
-                        localStorage.setItem("agentName", username);
-                        localStorage.setItem("isAdmin", "false"); // Not Admin
-                        alert("✅ ACCESS GRANTED! Welcome Agent " + username);
-                        window.location.href = "index.html"; 
-                    } else {
-                        alert("🚫 ACCESS DENIED: Wrong Password!");
-                    }
-                } else {
-                    alert("❌ User not found! Please Signup first.");
-                }
-            }).catch((error) => {
-                alert("Server Error: " + error);
-            });
-        };
-    </script>
 </head>
 <body>
 
 <div class="auth-box">
-    <h2 id="loginTitle" class="glitch">System Access</h2>
+    <h2 class="glitch">SYSTEM LOGIN</h2>
 
-    <div class="input-group">
-        <label>CODENAME (USERNAME)</label>
-        <input type="text" id="loginUser" placeholder="Enter Codename">
+    <div id="login-form">
+        <div class="input-group">
+            <label>CODENAME</label>
+            <input type="text" id="loginUser" placeholder="Enter Username">
+        </div>
+
+        <div class="input-group">
+            <label>PASSWORD</label>
+            <input type="password" id="loginPass" placeholder="Enter Password">
+        </div>
+        
+        <button onclick="attemptLogin()">LOGIN</button>
     </div>
 
-    <div class="input-group">
-        <label>ACCESS KEY (PASSWORD)</label>
-        <input type="password" id="loginPass" placeholder="Enter Password">
+    <div id="otp-form" style="display:none;">
+        <h3 style="color:gold;">⚠️ ADMIN VERIFICATION</h3>
+        <p style="color:#ccc; font-size:12px;">OTP sent to registered Admin Email.</p>
+        <div class="input-group">
+            <label>ENTER OTP CODE</label>
+            <input type="number" id="adminOtp" placeholder="e.g. 1234">
+        </div>
+        <button onclick="verifyAdminOtp()">VERIFY & ENTER</button>
     </div>
-    
-    <button onclick="checkLogin()">Execute Login</button>
 
     <div class="auth-links">
-        <a href="signup.html">Create Account</a> |
-        <a href="forgot_password.html">Forgot Password?</a>
+        <a href="signup.html">Create Account</a>
     </div>
 </div>
 
 <script>
-    function checkLogin() {
-        const enteredUser = document.getElementById("loginUser").value;
-        const enteredPass = document.getElementById("loginPass").value;
+    // --- LOGIN LOGIC ---
+    function attemptLogin() {
+        const user = document.getElementById("loginUser").value;
+        const pass = document.getElementById("loginPass").value;
 
-        if (window.firebaseLogin) {
-            document.querySelector("button").innerText = "Authenticating...";
-            window.firebaseLogin(enteredUser, enteredPass);
+        // 1. ADMIN CHECK
+        if (user === "Admin" && pass === "Love@728296#$") {
+            // Hide Login Form, Show OTP Form
+            document.getElementById("login-form").style.display = "none";
+            document.getElementById("otp-form").style.display = "block";
+            alert("🔒 Admin Detected! OTP Sent to Email (Demo OTP: 1234)");
+            return;
+        }
+
+        // 2. NORMAL USER CHECK (Firebase Logic yahan aayega)
+        // Abhi ke liye simulation:
+        if (user && pass) {
+            localStorage.setItem("agentName", user);
+            localStorage.setItem("isAdmin", "false");
+            alert("✅ Welcome Agent " + user);
+            window.location.href = "index.html";
         } else {
-            alert("Connecting to Database...");
+            alert("❌ Invalid Credentials");
+        }
+    }
+
+    // --- OTP VERIFICATION ---
+    function verifyAdminOtp() {
+        const otp = document.getElementById("adminOtp").value;
+        
+        // Hardcoded OTP '1234' for now
+        if(otp === "1234") {
+            localStorage.setItem("agentName", "Admin");
+            localStorage.setItem("isAdmin", "true");
+            alert("🔓 SYSTEM UNLOCKED: Welcome Commander.");
+            window.location.href = "index.html";
+        } else {
+            alert("🚫 WRONG OTP! Access Denied.");
+            location.reload();
         }
     }
 </script>
 
 </body>
 </html>
-
