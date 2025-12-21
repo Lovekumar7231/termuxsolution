@@ -2,9 +2,9 @@
 include 'db_connect.php';
 session_start();
 
-// Admin Security Check
+// Security: Check if Admin
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    die("❌ ACCESS DENIED: Only Admin can upload tools.");
+    die("❌ UNAUTHORIZED ACCESS. IP LOGGED.");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -22,3 +22,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
