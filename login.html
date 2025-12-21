@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="auth-style.css"> 
     
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -13,67 +13,113 @@
 </head>
 <body>
 
-<div class="auth-box" style="margin-top:100px;">
-    <h2 class="glitch">SYSTEM ACCESS</h2>
+<div class="auth-box">
+    <h2 class="glitch" id="loginTitle">SYSTEM LOGIN</h2>
 
     <div id="login-form">
-        <input type="text" id="loginUser" placeholder="Codename (Use 'Admin' for Admin)">
-        <input type="password" id="loginPass" placeholder="Password">
-        <button class="btn-main" onclick="handleLogin()">EXECUTE LOGIN</button>
+        <div class="input-group">
+            <label>CODENAME</label>
+            <input type="text" id="loginUser" placeholder="Enter Codename">
+        </div>
+
+        <div class="input-group">
+            <label>PASSWORD</label>
+            <input type="password" id="loginPass" placeholder="Enter Password">
+        </div>
+
+        <div class="input-group" style="border:1px dashed #00ff41; padding:10px;">
+            <label style="color:gold;">SECURITY CHECK</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                <span id="captcha-question" style="color:white; font-size:18px; font-weight:bold; letter-spacing:2px;">5 + 3 = ?</span>
+                <input type="number" id="captcha-input" placeholder="?" style="width:60px; text-align:center; margin:0;">
+            </div>
+        </div>
+
+        <button onclick="handleLogin()">EXECUTE LOGIN</button>
+        
+        <div style="margin-top:15px; font-size:12px; display:flex; justify-content:space-between;">
+            <a href="forgot_password.html" style="color:#ff0055;">Forgot Password?</a>
+            <a href="signup.html" style="color:#00ff41;">Create Account</a>
+        </div>
     </div>
 
     <div id="otp-form" style="display:none;">
-        <p style="color:gold;">⚠️ ADMIN DETECTED. OTP SENT.</p>
-        <input type="number" id="adminOtp" placeholder="Enter OTP Code">
-        <button class="btn-gold" onclick="verifyAdminOtp()">VERIFY & UNLOCK</button>
-    </div>
-
-    <div style="margin-top:20px;">
-        <a href="signup.html" style="color:white;">Create Account</a>
+        <p style="color:gold; font-weight:bold;">⚠️ COMMANDER DETECTED</p>
+        <p style="font-size:12px; color:#ccc; margin-bottom:10px;">OTP Sent to termuxhacking72@gmail.com</p>
+        <div class="input-group">
+            <input type="number" id="adminOtp" placeholder="Enter OTP Code">
+        </div>
+        <button onclick="verifyAdminOtp()">UNLOCK SYSTEM</button>
     </div>
 </div>
 
 <script>
+    // --- CAPTCHA LOGIC ---
+    let num1 = Math.floor(Math.random() * 10);
+    let num2 = Math.floor(Math.random() * 10);
+    document.getElementById('captcha-question').innerText = `${num1} + ${num2} = ?`;
+
     let generatedOtp = 0;
 
     function handleLogin() {
-        const user = document.getElementById('loginUser').value;
-        const pass = document.getElementById('loginPass').value;
-
-        // 1. ADMIN CHECK
-        if (user === "Admin" && pass === "Love@728296#$") {
-            generatedOtp = Math.floor(1000 + Math.random() * 9000);
-            
-            // EmailJS Send
-            emailjs.send("service_idclxul", "template_6sk2up1", {
-                to_email: "termuxhacking72@gamil.com", // APNA EMAIL DALEN
-                name: "Admin",
-                otp_code: generatedOtp
-            }).then(() => {
-                alert("✅ OTP Sent to Admin Email!");
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('otp-form').style.display = 'block';
-            });
+        // 1. CAPTCHA CHECK
+        const captchaAns = document.getElementById('captcha-input').value;
+        if(parseInt(captchaAns) !== (num1 + num2)) {
+            alert("❌ Security Check Failed! Wrong Captcha.");
             return;
         }
 
-        // 2. NORMAL USER (Simulation)
+        const user = document.getElementById('loginUser').value;
+        const pass = document.getElementById('loginPass').value;
+
+        // 2. ADMIN CHECK (OTP Logic)
+        if (user === "Admin" && pass === "Love@728296#$") {
+            
+            // Generate Random OTP
+            generatedOtp = Math.floor(1000 + Math.random() * 9000);
+            
+            // Button Text Change
+            const btn = document.querySelector('button');
+            btn.innerText = "SENDING OTP...";
+            btn.disabled = true;
+
+            // SEND OTP TO YOUR GMAIL
+            emailjs.send("service_idclxul", "template_6sk2up1", {
+                to_email: "termuxhacking72@gmail.com", // TARGET EMAIL
+                name: "Admin",
+                otp_code: generatedOtp
+            }).then(function() {
+                alert("✅ OTP Sent Successfully!");
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('otp-form').style.display = 'block';
+            }, function(error) {
+                alert("❌ OTP Sending Failed. Try Again.");
+                btn.innerText = "EXECUTE LOGIN";
+                btn.disabled = false;
+            });
+
+            return;
+        }
+
+        // 3. NORMAL USER LOGIN (Direct Login)
         if(user) {
             localStorage.setItem("agentName", user);
             localStorage.setItem("isAdmin", "false");
+            alert("✅ Welcome Agent " + user);
             window.location.href = "index.html";
         } else {
-            alert("Username required!");
+            alert("⚠️ Please Enter Codename!");
         }
     }
 
     function verifyAdminOtp() {
-        if(document.getElementById('adminOtp').value == generatedOtp) {
+        const enteredOtp = document.getElementById('adminOtp').value;
+        if(enteredOtp == generatedOtp) {
             localStorage.setItem("agentName", "COMMANDER");
             localStorage.setItem("isAdmin", "true");
             window.location.href = "index.html";
         } else {
-            alert("❌ WRONG OTP");
+            alert("❌ WRONG OTP! ACCESS DENIED.");
         }
     }
 </script>
