@@ -2,37 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Access</title>
+    <title>System Login</title>
     <link rel="stylesheet" href="auth-style.css">
-</head>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+       (function(){ emailjs.init("ijs5TFBMM18XzlFac"); })();
+    </script>
+    </head>
 <body>
 
 <div class="auth-box">
-    <h2 class="glitch">SYSTEM LOGIN</h2>
+    <h2 class="glitch">System Login</h2>
 
     <div id="login-form">
         <div class="input-group">
             <label>CODENAME</label>
-            <input type="text" id="loginUser" placeholder="Enter Username">
+            <input type="text" id="loginUser" placeholder="Enter Codename">
         </div>
-
         <div class="input-group">
             <label>PASSWORD</label>
             <input type="password" id="loginPass" placeholder="Enter Password">
         </div>
-        
-        <button onclick="attemptLogin()">LOGIN</button>
+        <button onclick="handleLogin()">EXECUTE LOGIN</button>
     </div>
 
     <div id="otp-form" style="display:none;">
-        <h3 style="color:gold;">⚠️ ADMIN VERIFICATION</h3>
-        <p style="color:#ccc; font-size:12px;">OTP sent to registered Admin Email.</p>
+        <p style="color:gold;">⚠️ ADMIN DETECTED. OTP SENT.</p>
         <div class="input-group">
-            <label>ENTER OTP CODE</label>
-            <input type="number" id="adminOtp" placeholder="e.g. 1234">
+            <input type="number" id="adminOtp" placeholder="Enter 4-Digit OTP">
         </div>
-        <button onclick="verifyAdminOtp()">VERIFY & ENTER</button>
+        <button onclick="verifyAdminOtp()">UNLOCK SYSTEM</button>
     </div>
 
     <div class="auth-links">
@@ -41,48 +40,51 @@
 </div>
 
 <script>
-    // --- LOGIN LOGIC ---
-    function attemptLogin() {
-        const user = document.getElementById("loginUser").value;
-        const pass = document.getElementById("loginPass").value;
+    let generatedOtp = 0;
+
+    function handleLogin() {
+        const user = document.getElementById('loginUser').value;
+        const pass = document.getElementById('loginPass').value;
 
         // 1. ADMIN CHECK
         if (user === "Admin" && pass === "Love@728296#$") {
-            // Hide Login Form, Show OTP Form
-            document.getElementById("login-form").style.display = "none";
-            document.getElementById("otp-form").style.display = "block";
-            alert("🔒 Admin Detected! OTP Sent to Email (Demo OTP: 1234)");
+            // Send OTP to Admin Email
+            generatedOtp = Math.floor(1000 + Math.random() * 9000);
+            alert("Sending OTP to Admin Email...");
+            
+            // EMAILJS SEND
+            emailjs.send("service_idclxul", "template_6sk2up1", {
+                to_email: "admin@gmail.com", // YOUR ADMIN EMAIL HERE
+                name: "Admin",
+                otp_code: generatedOtp
+            }).then(() => {
+                alert("✅ OTP Sent!");
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('otp-form').style.display = 'block';
+            });
             return;
         }
 
-        // 2. NORMAL USER CHECK (Firebase Logic yahan aayega)
-        // Abhi ke liye simulation:
-        if (user && pass) {
+        // 2. NORMAL USER CHECK (Old Logic)
+        // (Use your existing Firebase login code here for normal users)
+        // Temporary Simulation for Normal User:
+        if(user) {
             localStorage.setItem("agentName", user);
             localStorage.setItem("isAdmin", "false");
-            alert("✅ Welcome Agent " + user);
             window.location.href = "index.html";
-        } else {
-            alert("❌ Invalid Credentials");
         }
     }
 
-    // --- OTP VERIFICATION ---
     function verifyAdminOtp() {
-        const otp = document.getElementById("adminOtp").value;
-        
-        // Hardcoded OTP '1234' for now
-        if(otp === "1234") {
-            localStorage.setItem("agentName", "Admin");
+        const inputOtp = document.getElementById('adminOtp').value;
+        if(inputOtp == generatedOtp) {
+            localStorage.setItem("agentName", "COMMANDER");
             localStorage.setItem("isAdmin", "true");
-            alert("🔓 SYSTEM UNLOCKED: Welcome Commander.");
             window.location.href = "index.html";
         } else {
-            alert("🚫 WRONG OTP! Access Denied.");
-            location.reload();
+            alert("❌ WRONG OTP");
         }
     }
 </script>
-
 </body>
 </html>
