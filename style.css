@@ -40,3 +40,24 @@
     margin-top: 20px;
 }
 .tool-card img { width: 100%; height: 150px; object-fit: cover; }
+
+body {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    background: #050505;
+    color: #00ff41;
+}
+.sidebar {
+    height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; right: 0;
+    background-color: #111; overflow-x: hidden; transition: 0.3s; padding-top: 60px;
+    border-left: 1px solid #00ff41;
+}
+.sidebar a {
+    padding: 10px 25px; text-decoration: none; font-size: 18px; color: #818181; display: block;
+    border-bottom: 1px solid #222;
+}
+.container { padding: 20px; }
+.card { background: #0d1117; border-radius: 5px; overflow: hidden; }
+header { padding: 15px; display: flex; justify-content: space-between; background: #000; border-bottom: 1px solid #00ff41; }
+.menu-icon { font-size: 24px; cursor: pointer; }
+@keyframes blink { 50% { opacity: 0; } }
