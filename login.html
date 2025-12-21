@@ -2,40 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Login</title>
-    <link rel="stylesheet" href="auth-style.css">
+    <link rel="stylesheet" href="style.css">
+    
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
        (function(){ emailjs.init("ijs5TFBMM18XzlFac"); })();
     </script>
-    </head>
+</head>
 <body>
 
-<div class="auth-box">
-    <h2 class="glitch">System Login</h2>
+<div class="auth-box" style="margin-top:100px;">
+    <h2 class="glitch">SYSTEM ACCESS</h2>
 
     <div id="login-form">
-        <div class="input-group">
-            <label>CODENAME</label>
-            <input type="text" id="loginUser" placeholder="Enter Codename">
-        </div>
-        <div class="input-group">
-            <label>PASSWORD</label>
-            <input type="password" id="loginPass" placeholder="Enter Password">
-        </div>
-        <button onclick="handleLogin()">EXECUTE LOGIN</button>
+        <input type="text" id="loginUser" placeholder="Codename (Use 'Admin' for Admin)">
+        <input type="password" id="loginPass" placeholder="Password">
+        <button class="btn-main" onclick="handleLogin()">EXECUTE LOGIN</button>
     </div>
 
     <div id="otp-form" style="display:none;">
         <p style="color:gold;">⚠️ ADMIN DETECTED. OTP SENT.</p>
-        <div class="input-group">
-            <input type="number" id="adminOtp" placeholder="Enter 4-Digit OTP">
-        </div>
-        <button onclick="verifyAdminOtp()">UNLOCK SYSTEM</button>
+        <input type="number" id="adminOtp" placeholder="Enter OTP Code">
+        <button class="btn-gold" onclick="verifyAdminOtp()">VERIFY & UNLOCK</button>
     </div>
 
-    <div class="auth-links">
-        <a href="signup.html">Create Account</a>
+    <div style="margin-top:20px;">
+        <a href="signup.html" style="color:white;">Create Account</a>
     </div>
 </div>
 
@@ -48,36 +42,33 @@
 
         // 1. ADMIN CHECK
         if (user === "Admin" && pass === "Love@728296#$") {
-            // Send OTP to Admin Email
             generatedOtp = Math.floor(1000 + Math.random() * 9000);
-            alert("Sending OTP to Admin Email...");
             
-            // EMAILJS SEND
+            // EmailJS Send
             emailjs.send("service_idclxul", "template_6sk2up1", {
-                to_email: "admin@gmail.com", // YOUR ADMIN EMAIL HERE
+                to_email: "admin@gmail.com", // APNA EMAIL DALEN
                 name: "Admin",
                 otp_code: generatedOtp
             }).then(() => {
-                alert("✅ OTP Sent!");
+                alert("✅ OTP Sent to Admin Email!");
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('otp-form').style.display = 'block';
             });
             return;
         }
 
-        // 2. NORMAL USER CHECK (Old Logic)
-        // (Use your existing Firebase login code here for normal users)
-        // Temporary Simulation for Normal User:
+        // 2. NORMAL USER (Simulation)
         if(user) {
             localStorage.setItem("agentName", user);
             localStorage.setItem("isAdmin", "false");
             window.location.href = "index.html";
+        } else {
+            alert("Username required!");
         }
     }
 
     function verifyAdminOtp() {
-        const inputOtp = document.getElementById('adminOtp').value;
-        if(inputOtp == generatedOtp) {
+        if(document.getElementById('adminOtp').value == generatedOtp) {
             localStorage.setItem("agentName", "COMMANDER");
             localStorage.setItem("isAdmin", "true");
             window.location.href = "index.html";
@@ -86,5 +77,7 @@
         }
     }
 </script>
+
 </body>
 </html>
+
