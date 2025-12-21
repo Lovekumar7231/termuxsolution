@@ -6,116 +6,134 @@
 <title>Termux Hacking Family</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+    /* New Styles for Modal & Admin */
+    .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); overflow-y: auto;}
+    .modal-content { background-color: #0d1117; margin: 5% auto; padding: 20px; border: 1px solid #00ff41; width: 90%; max-width: 600px; color: #fff; border-radius: 8px; position: relative; }
+    .close-modal { color: #ff0055; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .admin-input { width: 100%; padding: 10px; margin: 5px 0; background: #000; color: #0f0; border: 1px solid #333; }
+    .live-banner { display: none; background: linear-gradient(45deg, #f09433, #dc2743); padding: 10px; color: white; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+    .card img { width: 100%; height: 160px; object-fit: cover; border-radius: 5px; }
+</style>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    window.firebaseLoaded = true;
+    window.dbRef = ref;
+    window.dbPush = push;
+    window.dbOnValue = onValue;
+    window.dbInstance = getDatabase(initializeApp({
+        apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
+        authDomain: "termuxhacking-aac55.firebaseapp.com",
+        projectId: "termuxhacking-aac55",
+        storageBucket: "termuxhacking-aac55.firebasestorage.app",
+        messagingSenderId: "921781091312",
+        appId: "1:921781091312:web:39a1b96ceda5bc60b83b35"
+    }));
+</script>
 </head>
 
-<body onload="checkGlobalLoginState()">
+<body onload="initApp()">
 
-  <div id="live-banner" class="live-banner" style="display:none;">
-      <div class="live-ring">
-          <img src="https://via.placeholder.com/40" alt="Admin">
+  <div id="live-banner" class="live-banner">
+      <div style="display:flex; align-items:center; gap:10px;">
+          <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:30px; border-radius:50%; border:2px solid white;">
+          <span><strong>ADMIN LIVE:</strong> <span id="live-msg-text">Welcome!</span></span>
       </div>
-      <div class="live-text">
-          <strong>Admin is Live:</strong> <span id="live-msg-text">Important Update!</span>
-      </div>
-      <button onclick="closeLive()" class="close-live-btn">&times;</button>
+      <button onclick="document.getElementById('live-banner').style.display='none'" style="background:none; border:none; color:white; font-size:20px;">&times;</button>
   </div>
 
   <header>
     <div class="logo-area">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon-header" id="headerProfileImg" onclick="showSection('profile')">
-        <div class="logo">Termux Family</div>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon-header" id="headerProfileImg">
+        <div class="logo">Termux Family <span id="admin-badge" style="display:none; color:red; font-size:10px;">(ADMIN)</span></div>
     </div>
-    <div class="menu-icon" onclick="openNav()">☰</div>
+    <div class="menu-icon" onclick="openNav()" style="font-size:24px; cursor:pointer;">☰</div>
   </header>
 
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <a onclick="showSection('home')">🏠 Home</a>
-    <a onclick="showSection('profile')">👤 My Profile</a>
-    <a onclick="showSection('commands')">KB Tools & Scripts</a>
     <a onclick="showSection('prime')">👑 Prime Zone</a>
+    <div id="admin-link" style="display:none;"><a onclick="showSection('admin')" style="color:red;">⚠️ Admin Panel</a></div>
     
-    <div id="admin-link" style="display:none;">
-        <a onclick="showSection('admin')" style="color:red;">⚠️ Admin Panel</a>
-    </div>
-
     <div id="loggedOutLinks">
         <a href="login.html" style="color: gold;">🔑 Login</a>
         <a href="signup.html" style="color: gold;">📝 Signup</a>
     </div>
     <div id="loggedInLinks" style="display:none;">
-        <a onclick="logout()" style="color: #ff0055; font-weight:bold;">🚪 Logout</a>
+        <a onclick="logout()" style="color: #ff0055; border-top:1px solid #333;">🚪 Logout</a>
     </div>
   </div>
 
 <div class="container">
 
   <div id="home-section" class="hidden-section">
-    <h3>Latest Tools & Updates</h3>
+    <h3>🔥 Latest Tools & Scripts</h3>
+    
+    <div id="tools-loader" style="color:#666; text-align:center;">Loading Tools from Database...</div>
     <div id="tools-grid" class="grid-container">
         </div>
   </div>
 
-  <div id="article-viewer" class="modal" style="display:none;">
-      <div class="modal-content">
-          <span class="close-modal" onclick="closeArticle()">&times;</span>
-          <h2 id="view-title" style="color:#00ff41;">Tool Name</h2>
-          <img id="view-img" src="" alt="Tool" style="width:100%; height:200px; object-fit:cover; border-radius:5px;">
-          
-          <h3 style="color:white; margin-top:10px;">Commands & Guide:</h3>
-          <p id="view-desc" style="color:#ccc; white-space: pre-line;">Loading...</p>
-          
-          <div class="video-box" style="margin-top:15px;">
-              <h3 style="color:gold;">Practical Video:</h3>
-              <iframe id="view-video" width="100%" height="250" src="" frameborder="0" allowfullscreen></iframe>
+  <div id="prime-section" class="hidden-section" style="display:none;">
+      <h2 style="color:gold; text-align:center;">👑 PRIME ZONE</h2>
+      
+      <div id="prime-locked" style="text-align:center; padding:20px; border:1px solid #ff0055; display:block;">
+          <h3>🔒 ACCESS DENIED</h3>
+          <p>Exclusive PDFs and Videos are for Prime Members only.</p>
+          <button class="btn btn-prime">Buy Membership - ₹499</button>
+      </div>
+
+      <div id="prime-unlocked" style="display:none;">
+          <div class="card" style="border-color:gold;">
+              <h4>📂 Exclusive: WiFi Hacking PDF</h4>
+              <button class="btn" style="background:gold; color:black;">Download PDF</button>
+          </div>
+          <div class="card" style="border-color:gold;">
+              <h4>🎥 Private Class: Termux Setup</h4>
+              <button class="btn" style="background:gold; color:black;">Watch Video</button>
           </div>
       </div>
   </div>
 
   <div id="admin-section" class="hidden-section" style="display:none;">
-      <h2 style="color:red;">⚠️ ADMIN CONTROL ROOM</h2>
+      <h2 style="color:red; text-align:center;">⚠️ ADMIN CONTROL ROOM</h2>
       
-      <div class="card" style="border-color:red;">
-          <h3>🔴 Go Live (Limit: 3/Day)</h3>
-          <input type="text" id="live-msg-input" class="profile-input" placeholder="Enter Live Message">
-          <button class="btn" style="background:red; color:white;" onclick="triggerLive()">GO LIVE NOW</button>
-          <p style="font-size:12px; color:#888;">Used: <span id="live-count-display">0</span>/3</p>
+      <div class="card" style="border:1px dashed red;">
+          <h3>🔴 Go Live (Limit 3/Day)</h3>
+          <input type="text" id="live-msg-input" class="admin-input" placeholder="Message...">
+          <button onclick="triggerGoLive()" class="btn" style="background:red; color:white;">GO LIVE</button>
+          <p style="font-size:12px;">Used: <span id="live-count">0</span>/3</p>
       </div>
 
-      <div class="card" style="border-color:#00ff41;">
+      <div class="card" style="border:1px solid #00ff41;">
           <h3>🛠 Upload New Tool</h3>
-          <input type="text" id="new-tool-title" class="profile-input" placeholder="Tool Name">
-          <textarea id="new-tool-desc" class="profile-input" placeholder="Commands / Steps..."></textarea>
-          <input type="text" id="new-tool-img" class="profile-input" placeholder="Image URL">
-          <input type="text" id="new-tool-video" class="profile-input" placeholder="YouTube Video ID (e.g. dQw4w9WgXcQ)">
-          <button class="btn" onclick="uploadNewTool()">UPLOAD TO HOME</button>
+          <input type="text" id="tool-name" class="admin-input" placeholder="Tool Name">
+          <input type="text" id="tool-img" class="admin-input" placeholder="Image URL">
+          <input type="text" id="tool-vid" class="admin-input" placeholder="YouTube Video ID (e.g. dQw4w9WgXcQ)">
+          <textarea id="tool-desc" class="admin-input" style="height:100px;" placeholder="Step by Step Guide..."></textarea>
+          <button onclick="uploadTool()" class="btn" style="background:#00ff41; color:black; font-weight:bold;">UPLOAD TOOL</button>
       </div>
   </div>
 
-  <div id="prime-section" class="hidden-section" style="display:none;">
-      <h2 class="glitch" style="color:gold;">👑 PRIME MEMBERSHIP</h2>
-      <div id="prime-content-locked">
-          <div class="card prime-card-border">
-              <p>Join Prime to access Private Tools, Number & Live Classes.</p>
-              <button class="btn btn-prime">Buy Membership - ₹499</button>
-          </div>
-      </div>
-      <div id="prime-content-unlocked" style="display:none;">
-          <div class="card" style="border:1px solid gold;">
-             <h3>📞 Admin Personal Number</h3>
-             <p style="color:#00ff41; font-size:20px;">+91 7231860034</p>
-          </div>
-      </div>
-  </div>
+</div>
 
-  <div id="profile-section" class="hidden-section" style="display:none;">
-    <h2 style="color:#00ff41;">My Profile</h2>
-    <div class="card">
-        <h3 id="profileNameDisplay">Guest</h3>
-        <button class="btn" onclick="logout()">Logout</button>
+<div id="articleModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 id="modal-title" style="color:#00ff41;">Tool Name</h2>
+        <img id="modal-img" src="" style="width:100%; height:200px; object-fit:cover; margin-bottom:15px;">
+        
+        <h4 style="color:gold;">📝 Step-by-Step Guide:</h4>
+        <div id="modal-desc" style="background:#000; padding:10px; white-space: pre-wrap; font-family:monospace; color:#ccc; margin-bottom:15px;"></div>
+        
+        <h4 style="color:#ff0055;">🎥 Practical Video:</h4>
+        <div id="modal-video-container">
+            <iframe id="modal-video" width="100%" height="250" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
     </div>
-  </div>
-
 </div>
 
 <script src="script.js"></script>
