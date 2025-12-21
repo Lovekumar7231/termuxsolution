@@ -1,122 +1,56 @@
-// Variable to track Login State (False = Guest, True = Logged In)
-let isLoggedIn = false;
+/* --- SIDEBAR LOGIC --- */
+function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
+function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
 
-// 1. Function to Toggle (Show/Hide) the 3-Dot Menu
-function toggleMenu() {
-    const menu = document.getElementById('dropdown');
+/* --- FULL ARTICLE MODAL LOGIC --- */
+function openArticle(title, cmds, img, videoId) {
+    document.getElementById("modal-title").innerText = title;
+    document.getElementById("modal-desc").innerText = cmds;
+    document.getElementById("modal-img").src = img;
     
-    // Pehle menu items update karo current state ke hisab se
-    updateMenuContent();
+    // Video Setup
+    const vidContainer = document.getElementById("video-container");
+    const vidFrame = document.getElementById("modal-video");
     
-    // Class toggle karo (CSS mein display: block ho jayega)
-    menu.classList.toggle('active');
-}
-
-// 2. Function to Update Menu Content dynamically
-function updateMenuContent() {
-    const menu = document.getElementById('dropdown');
-    
-    if (!isLoggedIn) {
-        // Agar user Guest hai
-        menu.innerHTML = `
-            <div class="dropdown-item btn-login-menu" onclick="openLoginModal()">Login / Sign Up</div>
-            <div class="dropdown-item">Pricing Plans</div>
-            <div class="dropdown-item">About Us</div>
-            <div class="dropdown-item">Contact Support</div>
-        `;
+    if (videoId && videoId.length > 5) {
+        vidContainer.style.display = "block";
+        vidFrame.src = "https://www.youtube.com/embed/" + videoId;
     } else {
-        // Agar user Logged In hai
-        menu.innerHTML = `
-            <div class="dropdown-item"><b>My Profile</b></div>
-            <div class="dropdown-item">My Dashboard</div>
-            <div class="dropdown-item">Purchased Notes</div>
-            <div class="dropdown-item btn-logout" onclick="logout()">Logout</div>
-        `;
+        vidContainer.style.display = "none";
+        vidFrame.src = "";
     }
-}
-
-// 3. Login Modal Functions
-function openLoginModal() {
-    // Menu band karo
-    document.getElementById('dropdown').classList.remove('active');
-    // Modal dikhao
-    document.getElementById('loginModal').style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('loginModal').style.display = 'none';
-}
-
-// 4. Simulate Login (Testing ke liye)
-function simulateLogin() {
-    const username = document.querySelector('.input-field').value;
     
-    if(username) {
-        isLoggedIn = true;
-        closeModal();
-        alert("Welcome " + username + "! You are now logged in.");
-    } else {
-        alert("Just click 'Login Now' for demo (Enter any name).");
-        isLoggedIn = true; // Force login for demo
-        closeModal();
+    document.getElementById("articleModal").style.display = "block";
+}
+
+function closeArticle() {
+    document.getElementById("articleModal").style.display = "none";
+    document.getElementById("modal-video").src = ""; // Stop Video
+}
+
+/* --- GO LIVE LIMIT LOGIC (Client Side for Admin) --- */
+let liveCount = 0; // Reset on refresh (Better to use localStorage for daily limit)
+
+function triggerLive() {
+    // Check local storage for today's limit
+    let today = new Date().toDateString();
+    let storedData = JSON.parse(localStorage.getItem("adminLiveLimit")) || { date: today, count: 0 };
+
+    if (storedData.date !== today) {
+        storedData = { date: today, count: 0 }; // Reset if new day
     }
-}
 
-// 5. Logout Function
-function logout() {
-    isLoggedIn = false;
-    alert("You have been logged out.");
-    // Menu band karo taki agli baar refresh hoke khule
-    document.getElementById('dropdown').classList.remove('active');
-}
-
-// Close menu if clicked outside (Optional UX improvement)
-window.onclick = function(event) {
-    if (!event.target.matches('.three-dots')) {
-        var dropdowns = document.getElementsByClassName("dropdown-menu");
-        for (var i = 0; i < dropdowns.length; i++) {
-            var openDropdown = dropdowns[i];
-            if (openDropdown.classList.contains('active')) {
-                openDropdown.classList.remove('active');
-            }
-        }
+    if (storedData.count >= 3) {
+        alert("🚫 LIMIT REACHED: You can only go live 3 times per day.");
+        return;
     }
-}
 
-/* Live Dashboard Open Karne Par */
-function openLiveDashboard() {
-    const section = document.getElementById("live-dashboard-section");
-    section.style.display = "flex"; // Note: Yahan 'block' nahi 'flex' use karein
+    const msg = document.getElementById("live-msg-input").value;
+    document.getElementById("live-msg-text").innerText = msg || "Admin is Live!";
+    document.getElementById("live-banner").style.display = "flex";
     
-    const chat = document.getElementById("chat-box");
-    // Agar chat khali hai to welcome msg dikhao
-    if(chat.innerHTML.trim() === "") {
-        systemMsg("🔒 Connected to Encrypted Server...");
-        setTimeout(() => systemMsg("👋 Welcome Agent"), 1000);
-    }
-}
-
-/* Message Bhejne Ka Logic */
-function sendChat() {
-    const input = document.getElementById("my-chat-msg");
-    if (!input.value) return;
-    
-    const d = document.createElement("div");
-    d.style.marginBottom = "8px";
-    d.innerHTML = `<b style="color:#00ff41">You:</b> <span style="color:#fff">${input.value}</span>`;
-    
-    const chatBox = document.getElementById("chat-box");
-    chatBox.appendChild(d);
-    chatBox.scrollTop = chatBox.scrollHeight; // Auto scroll niche
-    
-    input.value = ""; // Input khali karo
-}
-
-function systemMsg(t) {
-    const d = document.createElement("div");
-    d.style.color = "#888";
-    d.style.fontSize = "12px";
-    d.style.marginBottom = "5px";
-    d.innerText = t;
-    document.getElementById("chat-box").appendChild(d);
+    // Increment Count
+    storedData.count++;
+    localStorage.setItem("adminLiveLimit", JSON.stringify(storedData));
+    document.getElementById("live-count").innerText = storedData.count + "/3 Used";
 }
