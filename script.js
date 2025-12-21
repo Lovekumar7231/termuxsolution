@@ -1,157 +1,167 @@
-// --- DATA STORAGE (Simulation) ---
-let toolsDB = [
-    {
-        id: 1,
-        title: "Termux Basic Setup",
-        desc: "apt update && apt upgrade\npkg install python\npkg install git",
-        img: "https://via.placeholder.com/300/000000/00ff41?text=Setup",
-        video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-        id: 2,
-        title: "Nmap Scanning",
-        desc: "pkg install nmap\nnmap -sV google.com",
-        img: "https://via.placeholder.com/300/000000/ff0055?text=Nmap",
-        video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    }
-];
+// --- GLOBAL VARIABLES ---
+let currentUser = null;
+let isAdmin = false;
+let liveUsage = parseInt(localStorage.getItem('liveUsageCount')) || 0;
+let lastLiveDate = localStorage.getItem('lastLiveDate');
 
-let liveUsage = 0; // Limit counter
-
-document.addEventListener('DOMContentLoaded', () => {
-    checkGlobalLoginState();
-    renderTools();
-});
-
-// --- 1. RENDER TOOLS (Home Page) ---
-function renderTools() {
-    const grid = document.getElementById('tools-grid');
-    if(!grid) return;
-    grid.innerHTML = "";
-
-    toolsDB.forEach(tool => {
-        const card = `
-            <div class="card tool-card">
-                <img src="${tool.img}" alt="${tool.title}">
-                <div style="padding:10px;">
-                    <h3 style="color:#00ff41;">${tool.title}</h3>
-                    <button class="btn" onclick="openArticle(${tool.id})">See All / Read More</button>
-                </div>
-            </div>
-        `;
-        grid.innerHTML += card;
-    });
-}
-
-// --- 2. MODAL VIEW (Open Article) ---
-function openArticle(id) {
-    const tool = toolsDB.find(t => t.id === id);
-    if(tool) {
-        document.getElementById('view-title').innerText = tool.title;
-        document.getElementById('view-desc').innerText = tool.desc;
-        document.getElementById('view-img').src = tool.img;
-        document.getElementById('view-video').src = tool.video;
-        document.getElementById('article-viewer').style.display = 'block';
-    }
-}
-
-function closeArticle() {
-    document.getElementById('article-viewer').style.display = 'none';
-    document.getElementById('view-video').src = ""; // Stop Video
-}
-
-// --- 3. ADMIN: UPLOAD TOOL ---
-function uploadNewTool() {
-    // Security Check
-    if(localStorage.getItem("isAdmin") !== "true") {
-        alert("❌ Access Denied!");
-        return;
-    }
-
-    const title = document.getElementById('new-tool-title').value;
-    const desc = document.getElementById('new-tool-desc').value;
-    const img = document.getElementById('new-tool-img').value;
-    const vid = document.getElementById('new-tool-video').value;
-
-    if(title && desc) {
-        toolsDB.unshift({ // Add to top
-            id: Date.now(),
-            title, desc, img,
-            video: `https://www.youtube.com/embed/${vid}`
-        });
-        alert("✅ Tool Uploaded Successfully!");
-        renderTools(); // Refresh Grid
-        showSection('home');
-    } else {
-        alert("⚠️ Title and Description required!");
-    }
-}
-
-// --- 4. ADMIN: GO LIVE (Limit 3) ---
-function triggerLive() {
-    if(localStorage.getItem("isAdmin") !== "true") return;
-
-    if(liveUsage >= 3) {
-        alert("🚫 Limit Reached! You can only Go Live 3 times per day.");
-        return;
-    }
-
-    const msg = document.getElementById('live-msg-input').value;
-    document.getElementById('live-msg-text').innerText = msg || "Admin is Live!";
-    document.getElementById('live-banner').style.display = 'flex';
+// --- INITIALIZATION ---
+function initApp() {
+    checkLoginStatus();
+    loadToolsFromFirebase();
     
-    liveUsage++;
-    document.getElementById('live-count-display').innerText = liveUsage;
+    // Check Live Limit Date Reset
+    const today = new Date().toDateString();
+    if (lastLiveDate !== today) {
+        liveUsage = 0;
+        localStorage.setItem('liveUsageCount', 0);
+        localStorage.setItem('lastLiveDate', today);
+    }
+    document.getElementById('live-count').innerText = liveUsage;
 }
 
-function closeLive() {
-    document.getElementById('live-banner').style.display = 'none';
-}
-
-// --- 5. NAVIGATION & LOGIN CHECK ---
+// --- NAVIGATION ---
 function showSection(id) {
-    document.getElementById("mySidebar").style.width = "0"; // Close Sidebar
-    document.querySelectorAll('.hidden-section').forEach(s => s.style.display = 'none');
+    document.querySelectorAll('.hidden-section').forEach(el => el.style.display = 'none');
+    document.getElementById(id + '-section').style.display = 'block';
     
-    const target = document.getElementById(id + '-section');
-    if(target) target.style.display = 'block';
+    if(id === 'prime') checkPrimeAccess();
+    closeNav();
 }
 
 function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
 function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
 
-function checkGlobalLoginState() {
-    const user = localStorage.getItem("agentName");
-    const isAdmin = localStorage.getItem("isAdmin") === "true";
-
-    if(user) {
-        // Logged In
-        document.getElementById("loggedOutLinks").style.display = "none";
-        document.getElementById("loggedInLinks").style.display = "block";
+// --- LOGIN CHECK ---
+function checkLoginStatus() {
+    const name = localStorage.getItem("agentName");
+    const adminFlag = localStorage.getItem("isAdmin");
+    
+    if (name) {
+        currentUser = name;
+        isAdmin = (adminFlag === "true");
         
-        // Show Admin Link if Admin
-        if(isAdmin) {
-            document.getElementById("admin-link").style.display = "block";
-            document.getElementById("profileNameDisplay").innerText = "COMMANDER (Admin)";
-            document.getElementById("profileNameDisplay").style.color = "red";
-        } else {
-            document.getElementById("profileNameDisplay").innerText = "Agent " + user;
+        document.getElementById('loggedOutLinks').style.display = 'none';
+        document.getElementById('loggedInLinks').style.display = 'block';
+        
+        if (isAdmin) {
+            document.getElementById('admin-link').style.display = 'block';
+            document.getElementById('admin-badge').style.display = 'inline';
         }
-
-        // Unlock Prime for Admin
-        if(isAdmin) {
-             document.getElementById('prime-content-locked').style.display = 'none';
-             document.getElementById('prime-content-unlocked').style.display = 'block';
-        }
+        showSection('home');
     } else {
-        // Guest
-        document.getElementById("loggedOutLinks").style.display = "block";
-        document.getElementById("loggedInLinks").style.display = "none";
+        showSection('home'); // Show home for guest
     }
 }
 
 function logout() {
     localStorage.clear();
     location.href = "login.html";
+}
+
+// --- FIREBASE: LOAD TOOLS ---
+function loadToolsFromFirebase() {
+    const dbRef = window.dbInstance; 
+    const toolsRef = window.dbRef(dbRef, 'tools');
+    
+    window.dbOnValue(toolsRef, (snapshot) => {
+        const grid = document.getElementById('tools-grid');
+        document.getElementById('tools-loader').style.display = 'none';
+        grid.innerHTML = "";
+        
+        const data = snapshot.val();
+        if (data) {
+            Object.values(data).forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${tool.img}" onerror="this.src='https://via.placeholder.com/300'">
+                    <div style="padding:15px;">
+                        <h4 style="color:#00ff41; margin-top:0;">${tool.name}</h4>
+                        <button class="btn" style="background:#222; border:1px solid #00ff41; color:#00ff41;" 
+                        onclick="openArticle('${tool.name}', '${escape(tool.desc)}', '${tool.img}', '${tool.video}')">
+                        See All / Read More
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        } else {
+            grid.innerHTML = "<p style='color:#666;'>No tools uploaded yet.</p>";
+        }
+    });
+}
+
+// --- FIREBASE: UPLOAD TOOL (ADMIN ONLY) ---
+function uploadTool() {
+    if (!isAdmin) return alert("❌ Access Denied!");
+    
+    const name = document.getElementById('tool-name').value;
+    const img = document.getElementById('tool-img').value;
+    const vid = document.getElementById('tool-vid').value;
+    const desc = document.getElementById('tool-desc').value;
+    
+    if (name && desc) {
+        const dbRef = window.dbInstance;
+        const toolsRef = window.dbRef(dbRef, 'tools');
+        window.dbPush(toolsRef, {
+            name: name,
+            img: img,
+            video: vid,
+            desc: desc
+        }).then(() => {
+            alert("✅ Tool Uploaded Successfully!");
+            showSection('home');
+        });
+    } else {
+        alert("⚠️ Name and Description are required!");
+    }
+}
+
+// --- MODAL: VIEW ARTICLE ---
+function openArticle(name, desc, img, vid) {
+    document.getElementById('modal-title').innerText = name;
+    document.getElementById('modal-img').src = img;
+    document.getElementById('modal-desc').innerText = unescape(desc);
+    
+    const vidFrame = document.getElementById('modal-video');
+    if(vid && vid.length > 5) {
+        document.getElementById('modal-video-container').style.display = 'block';
+        vidFrame.src = "https://www.youtube.com/embed/" + vid;
+    } else {
+        document.getElementById('modal-video-container').style.display = 'none';
+    }
+    
+    document.getElementById('articleModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('articleModal').style.display = 'none';
+    document.getElementById('modal-video').src = ""; // Stop video
+}
+
+// --- ADMIN FEATURES: GO LIVE ---
+function triggerGoLive() {
+    if(!isAdmin) return;
+    if(liveUsage >= 3) return alert("🚫 Daily Limit Reached (3/3)");
+    
+    const msg = document.getElementById('live-msg-input').value;
+    document.getElementById('live-msg-text').innerText = msg;
+    document.getElementById('live-banner').style.display = 'flex';
+    
+    liveUsage++;
+    localStorage.setItem('liveUsageCount', liveUsage);
+    document.getElementById('live-count').innerText = liveUsage;
+}
+
+// --- PRIME CHECK ---
+function checkPrimeAccess() {
+    // Simulation: Admin is automatically Prime
+    if(isAdmin) {
+        document.getElementById('prime-locked').style.display = 'none';
+        document.getElementById('prime-unlocked').style.display = 'block';
+    } else {
+        document.getElementById('prime-locked').style.display = 'block';
+        document.getElementById('prime-unlocked').style.display = 'none';
+    }
 }
 
