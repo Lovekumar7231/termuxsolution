@@ -1,63 +1,146 @@
-/* --- Live Banner Styles --- */
-.live-banner {
-    position: fixed; top: 0; left: 0; right: 0;
-    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743);
-    color: white;
-    padding: 10px;
-    z-index: 9999;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+:root {
+    --main: #00ff41;
+    --bg: #050505;
+    --card-bg: #111;
+    --danger: #ff0055;
+    --gold: #ffd700;
 }
-.live-ring img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; margin-right: 10px; }
-.close-live-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-
-/* --- Modal (Pop-up) Styles --- */
-.modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95);
-    z-index: 10000;
-    overflow-y: auto;
-    padding-top: 50px;
-}
-.modal-content {
-    background: #161b22;
-    margin: auto; padding: 20px;
-    width: 90%; max-width: 600px;
-    border: 1px solid #00ff41;
-    border-radius: 10px;
-    position: relative;
-}
-.close-modal {
-    position: absolute; top: 10px; right: 20px;
-    color: #ff0055; font-size: 30px; cursor: pointer;
-}
-
-/* --- Grid for Tools --- */
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-.tool-card img { width: 100%; height: 150px; object-fit: cover; }
 
 body {
     margin: 0;
+    padding: 0;
     font-family: 'Courier New', monospace;
-    background: #050505;
-    color: #00ff41;
+    background-color: var(--bg);
+    color: var(--main);
+    padding-bottom: 60px;
 }
+
+/* --- HEADER & NAV --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #000;
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-area { display: flex; align-items: center; gap: 10px; }
+
+/* 🔥 FIX: PROFILE IMAGE SIZE */
+.profile-icon-header {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--main);
+    object-fit: cover;
+}
+
+.menu-icon { font-size: 24px; cursor: pointer; }
+
+/* --- SIDEBAR --- */
 .sidebar {
-    height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; right: 0;
-    background-color: #111; overflow-x: hidden; transition: 0.3s; padding-top: 60px;
-    border-left: 1px solid #00ff41;
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    background-color: #000;
+    overflow-x: hidden;
+    transition: 0.3s;
+    padding-top: 60px;
+    border-left: 1px solid var(--main);
 }
 .sidebar a {
-    padding: 10px 25px; text-decoration: none; font-size: 18px; color: #818181; display: block;
+    padding: 10px 25px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #ccc;
+    display: block;
     border-bottom: 1px solid #222;
+    cursor: pointer;
 }
-.container { padding: 20px; }
-.card { background: #0d1117; border-radius: 5px; overflow: hidden; }
-header { padding: 15px; display: flex; justify-content: space-between; background: #000; border-bottom: 1px solid #00ff41; }
-.menu-icon { font-size: 24px; cursor: pointer; }
-@keyframes blink { 50% { opacity: 0; } }
+.sidebar a:hover { color: var(--main); }
+.closebtn {
+    position: absolute; top: 0; right: 25px; font-size: 36px; margin-left: 50px; color: var(--danger);
+}
+
+/* --- CARDS & LAYOUT --- */
+.container { padding: 15px; max-width: 800px; margin: auto; }
+.hidden-section { display: none; }
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid #333;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid #333;
+}
+.card-content { padding: 15px; }
+
+/* --- INPUTS & BUTTONS --- */
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: #000;
+    border: 1px solid #333;
+    color: white;
+    box-sizing: border-box;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    border: none;
+    margin-top: 5px;
+}
+.btn-main { background: var(--main); color: black; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-gold { background: var(--gold); color: black; }
+
+/* --- MODAL (POPUP) --- */
+.modal {
+    display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+    width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); overflow-y: auto;
+}
+.modal-content {
+    background: #0d1117; margin: 10% auto; padding: 20px;
+    border: 1px solid var(--main); width: 90%; max-width: 600px;
+    border-radius: 8px; position: relative;
+}
+.close-modal {
+    color: var(--danger); float: right; font-size: 28px;
+    font-weight: bold; cursor: pointer;
+}
+
+/* --- LIVE BANNER --- */
+.live-banner {
+    display: none;
+    background: linear-gradient(45deg, #f09433, #dc2743);
+    padding: 10px; color: white;
+    justify-content: space-between; align-items: center;
+    margin-bottom: 10px; border-radius: 5px;
+}
+
+/* --- AUTH BOX --- */
+.auth-box {
+    border: 1px solid var(--main);
+    padding: 20px;
+    text-align: center;
+    max-width: 350px;
+    margin: 50px auto;
+    background: #0d1117;
+}
+
