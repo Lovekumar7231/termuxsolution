@@ -1,190 +1,157 @@
-/* DOM Load hone ka wait karein taaki button click miss na ho */
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Menu Button ko pakdo
-    const menuBtn = document.getElementById("menuBtn");
-    const sidebar = document.getElementById("mySidebar");
-    const closeBtn = document.querySelector(".closebtn");
-
-    // Agar button mil gaya to click event lagao
-    if (menuBtn) {
-        menuBtn.addEventListener("click", function() {
-            console.log("Menu Clicked!"); // Testing ke liye
-            sidebar.style.width = "250px";
-        });
+// --- DATA STORAGE (Simulation) ---
+let toolsDB = [
+    {
+        id: 1,
+        title: "Termux Basic Setup",
+        desc: "apt update && apt upgrade\npkg install python\npkg install git",
+        img: "https://via.placeholder.com/300/000000/00ff41?text=Setup",
+        video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    },
+    {
+        id: 2,
+        title: "Nmap Scanning",
+        desc: "pkg install nmap\nnmap -sV google.com",
+        img: "https://via.placeholder.com/300/000000/ff0055?text=Nmap",
+        video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
     }
-
-    // Close button ka logic
-    if (closeBtn) {
-        closeBtn.addEventListener("click", function() {
-            sidebar.style.width = "0";
-        });
-    }
-});
-
-/* Navigation Manager (Updated to Hide Commands) */
-function showSection(name) {
-    // 1. Close the sidebar first
-    document.getElementById("mySidebar").style.width = "0";
-
-    // 2. List all section IDs that need to be hidden. 
-    // Added 'commands' to this array.
-    ["home", "login", "signup", "about", "prime", "commands"].forEach(s => {
-        const el = document.getElementById(s + "-section");
-        if (el) {
-            el.style.display = "none"; // Hide every section in the list
-        }
-    });
-
-    // 3. Show only the requested section
-    const target = document.getElementById(name + "-section");
-    if (target) {
-        target.style.display = "block"; // Show the targeted section
-    }
-}
-
-/* Live Dashboard Functions */
-function openLiveDashboard() {
-    // block ki jagah 'flex' karein
-    var dashboard = document.getElementById("live-dashboard-section");
-    dashboard.style.display = "flex"; 
-    dashboard.style.flexDirection = "column"; 
-}
-
-
-
-function openLiveDashboard() {
-    // Live Dashboard Section ko select karo
-    var dashboard = document.getElementById("live-dashboard-section");
-    
-    // Usko dikhane ke liye 'flex' set karo
-    if (dashboard) {
-        dashboard.style.display = "flex";
-        dashboard.style.flexDirection = "column";
-    }
-
-    // Chat box mein welcome message dikhane ka logic
-    var chat = document.getElementById("chat-box");
-    if (chat && chat.innerHTML.trim() === "") {
-         systemMsg("🔴 Connected to Encrypted Server...");
-         setTimeout(function(){ systemMsg("👋 Welcome Agent"); }, 1000);
-    }
-}
-
-
-
-function sendChat() {
-    const input = document.getElementById("my-chat-msg");
-    if (!input.value) return;
-    
-    const d = document.createElement("div");
-    d.style.marginBottom = "5px";
-    d.innerHTML = `<b style="color:#00ff41">You:</b> <span style="color:#fff">${input.value}</span>`;
-    
-    document.getElementById("chat-box").appendChild(d);
-    input.value = "";
-}
-
-function systemMsg(t) {
-    const d = document.createElement("div");
-    d.style.color = "#888";
-    d.innerText = t;
-    document.getElementById("chat-box").appendChild(d);
-}
-
-function joinPrime() {
-    alert("Payment Gateway Integration Pending...");
-}
-
-function openNav() {
-  document.getElementById("mySidebar").style.width = "250px";
-}
-
-function closeNav() {
-  document.getElementById("mySidebar").style.width = "0";
-}
-
-function handleUnlock() {
-    // This variable should be connected to your Razorpay/Firebase payment status later
-    let userIsPremium = false; 
-
-    if (userIsPremium) {
-        const container = document.getElementById('mobile-container');
-        const display = document.getElementById('number-display');
-        
-        // Update styling for Premium View
-        container.style.background = "#fff9e6"; 
-        container.style.border = "1px solid #ffeeba";
-        
-        display.innerHTML = `<i class="fas fa-phone-alt" style="color: #28a745; margin-right: 10px;"></i><span style="color: #28a745; font-weight: bold;">Mobile: +91 7231860034</span>`;
-        
-        // Hide the unlock button since it is already unlocked
-        container.querySelector('button').style.display = 'none';
-        alert("Access Granted: Support number is now visible.");
-    } else {
-        // English Alert Message
-        alert("🔒 This feature is exclusive to Premium Members. Please subscribe to view the contact number.");
-        
-        // Optional: Redirect user to payment page
-        // window.location.href = "payment.html";
-    }
-}
-
-// Sample Data
-let myTools = [
-    { name: "Nmap", cmds: "pkg install nmap\nnmap --version" },
-    { name: "Metasploit", cmds: "pkg install unstable-repo\npkg install metasploit" }
 ];
 
-// Display tools as large cards
+let liveUsage = 0; // Limit counter
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkGlobalLoginState();
+    renderTools();
+});
+
+// --- 1. RENDER TOOLS (Home Page) ---
 function renderTools() {
-    const list = document.getElementById('tools-list-container');
-    list.innerHTML = ""; 
+    const grid = document.getElementById('tools-grid');
+    if(!grid) return;
+    grid.innerHTML = "";
 
-    myTools.forEach((tool, index) => {
-        list.innerHTML += `
-            <div class="card tool-card" style="border: 1px solid #ff0066; margin-bottom: 20px; padding: 20px; text-align: center;">
-                <h3 style="color: #00ff00; font-size: 22px; margin-bottom: 15px;">📦 ${tool.name}</h3>
-                
-                <div id="cmds-${index}" style="display: none; background: #000; padding: 15px; border-radius: 5px; color: #0f0; font-family: monospace; text-align: left; border: 1px solid #333; margin-bottom: 15px; font-size: 14px; overflow-x: auto;">
-                    ${tool.cmds.replace(/\n/g, '<br>')}
+    toolsDB.forEach(tool => {
+        const card = `
+            <div class="card tool-card">
+                <img src="${tool.img}" alt="${tool.title}">
+                <div style="padding:10px;">
+                    <h3 style="color:#00ff41;">${tool.title}</h3>
+                    <button class="btn" onclick="openArticle(${tool.id})">See All / Read More</button>
                 </div>
-
-                <button onclick="toggleTool(${index})" style="background: #ff0066; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer;">
-                    VIEW COMMANDS
-                </button>
             </div>
         `;
+        grid.innerHTML += card;
     });
 }
 
-// Function to open/close commands
-function toggleTool(index) {
-    let box = document.getElementById(`cmds-${index}`);
-    box.style.display = (box.style.display === "none") ? "block" : "none";
-}
-
-// Search Filter
-function searchTools() {
-    let input = document.getElementById('toolSearch').value.toLowerCase();
-    let cards = document.getElementsByClassName('tool-card');
-
-    for (let card of cards) {
-        let name = card.innerText.toLowerCase();
-        card.style.display = name.includes(input) ? "block" : "none";
+// --- 2. MODAL VIEW (Open Article) ---
+function openArticle(id) {
+    const tool = toolsDB.find(t => t.id === id);
+    if(tool) {
+        document.getElementById('view-title').innerText = tool.title;
+        document.getElementById('view-desc').innerText = tool.desc;
+        document.getElementById('view-img').src = tool.img;
+        document.getElementById('view-video').src = tool.video;
+        document.getElementById('article-viewer').style.display = 'block';
     }
 }
 
-// Admin function to add new tool
-function addNewTool() {
-    let name = document.getElementById('adminToolName').value;
-    let cmds = document.getElementById('adminToolCmds').value;
-    if(name && cmds) {
-        myTools.push({name: name, cmds: cmds});
-        renderTools();
-        alert("Tool Saved!");
+function closeArticle() {
+    document.getElementById('article-viewer').style.display = 'none';
+    document.getElementById('view-video').src = ""; // Stop Video
+}
+
+// --- 3. ADMIN: UPLOAD TOOL ---
+function uploadNewTool() {
+    // Security Check
+    if(localStorage.getItem("isAdmin") !== "true") {
+        alert("❌ Access Denied!");
+        return;
+    }
+
+    const title = document.getElementById('new-tool-title').value;
+    const desc = document.getElementById('new-tool-desc').value;
+    const img = document.getElementById('new-tool-img').value;
+    const vid = document.getElementById('new-tool-video').value;
+
+    if(title && desc) {
+        toolsDB.unshift({ // Add to top
+            id: Date.now(),
+            title, desc, img,
+            video: `https://www.youtube.com/embed/${vid}`
+        });
+        alert("✅ Tool Uploaded Successfully!");
+        renderTools(); // Refresh Grid
+        showSection('home');
+    } else {
+        alert("⚠️ Title and Description required!");
     }
 }
 
-// Initialize on page load
-renderTools();
+// --- 4. ADMIN: GO LIVE (Limit 3) ---
+function triggerLive() {
+    if(localStorage.getItem("isAdmin") !== "true") return;
+
+    if(liveUsage >= 3) {
+        alert("🚫 Limit Reached! You can only Go Live 3 times per day.");
+        return;
+    }
+
+    const msg = document.getElementById('live-msg-input').value;
+    document.getElementById('live-msg-text').innerText = msg || "Admin is Live!";
+    document.getElementById('live-banner').style.display = 'flex';
+    
+    liveUsage++;
+    document.getElementById('live-count-display').innerText = liveUsage;
+}
+
+function closeLive() {
+    document.getElementById('live-banner').style.display = 'none';
+}
+
+// --- 5. NAVIGATION & LOGIN CHECK ---
+function showSection(id) {
+    document.getElementById("mySidebar").style.width = "0"; // Close Sidebar
+    document.querySelectorAll('.hidden-section').forEach(s => s.style.display = 'none');
+    
+    const target = document.getElementById(id + '-section');
+    if(target) target.style.display = 'block';
+}
+
+function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
+function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
+
+function checkGlobalLoginState() {
+    const user = localStorage.getItem("agentName");
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+
+    if(user) {
+        // Logged In
+        document.getElementById("loggedOutLinks").style.display = "none";
+        document.getElementById("loggedInLinks").style.display = "block";
+        
+        // Show Admin Link if Admin
+        if(isAdmin) {
+            document.getElementById("admin-link").style.display = "block";
+            document.getElementById("profileNameDisplay").innerText = "COMMANDER (Admin)";
+            document.getElementById("profileNameDisplay").style.color = "red";
+        } else {
+            document.getElementById("profileNameDisplay").innerText = "Agent " + user;
+        }
+
+        // Unlock Prime for Admin
+        if(isAdmin) {
+             document.getElementById('prime-content-locked').style.display = 'none';
+             document.getElementById('prime-content-unlocked').style.display = 'block';
+        }
+    } else {
+        // Guest
+        document.getElementById("loggedOutLinks").style.display = "block";
+        document.getElementById("loggedInLinks").style.display = "none";
+    }
+}
+
+function logout() {
+    localStorage.clear();
+    location.href = "login.html";
+}
+
