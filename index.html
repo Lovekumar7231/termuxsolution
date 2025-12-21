@@ -6,9 +6,12 @@
 <title>Termux Hacking Family</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, set, get, push, onValue, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     window.dbConfig = {
         apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
         authDomain: "termuxhacking-aac55.firebaseapp.com",
@@ -19,7 +22,8 @@
     };
     const app = initializeApp(window.dbConfig);
     const db = getDatabase(app);
-    window.db = db; window.dbRef = ref; window.dbPush = push; window.dbOnValue = onValue;
+    // Export functions for script.js
+    window.db = db; window.dbRef = ref; window.dbSet = set; window.dbGet = get; window.dbPush = push; window.dbOnValue = onValue;
 </script>
 </head>
 <body onload="initApp()">
@@ -27,17 +31,19 @@
   <div class="container">
       <div id="live-banner" class="live-banner">
           <div style="display:flex; align-items:center; gap:10px;">
-              <i class="fas fa-video fa-spin" style="color:white;"></i>
-              <span><strong>ADMIN IS LIVE</strong></span>
+              <i class="fas fa-broadcast-tower fa-spin" style="color:white;"></i>
+              <span><strong>ADMIN IS LIVE NOW!</strong> <span id="live-banner-msg">Check Live Classes section.</span></span>
           </div>
-          <button onclick="document.getElementById('live-banner').style.display='none'" style="background:none; color:white;">&times;</button>
       </div>
   </div>
 
   <header>
     <div class="logo-area">
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon-header">
-        <div class="logo" style="margin-left:10px;">Termux Family <span id="admin-badge" style="display:none; color:red;">(ADMIN)</span></div>
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon-header" id="headerProfileImg">
+        <div class="logo" style="margin-left:10px;">
+            <span id="headerUserName">Guest</span> 
+            <span id="admin-badge" style="display:none; color:red; font-size:12px;">(ADMIN)</span>
+        </div>
     </div>
     <div class="menu-icon" onclick="openNav()">☰</div>
   </header>
@@ -45,6 +51,8 @@
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <a onclick="showSection('home')">🏠 Home</a>
+    <a onclick="showSection('live')">🔴 Live Classes</a>
+    <a onclick="showSection('profile')">👤 My Profile</a>
     <a onclick="showSection('commands')">⌨️ Commands</a>
     <a onclick="showSection('prime')">👑 Prime Zone</a>
     <div id="admin-link" style="display:none;"><a onclick="showSection('admin')" style="color:red;">⚠️ Admin Panel</a></div>
@@ -59,20 +67,67 @@
         <div id="tools-grid"></div>
     </div>
 
+    <div id="live-section" class="hidden-section">
+        <h2 style="color:red; text-align:center;">🔴 ACTIVE LIVE CLASSES</h2>
+        
+        <div id="no-live-msg" style="text-align:center; padding:20px; color:#666;">
+            <h3>No Live Classes right now.</h3>
+            <p>Please check back later.</p>
+        </div>
+
+        <div id="active-live-card" class="card" style="border:2px solid red; background:#1a0000; display:none;">
+             <div class="card-content">
+                 <h3 style="color:red;">🔥 LIVE NOW: <span id="live-topic-user">Hacking Class</span></h3>
+                 <p>Click join to watch the real-time stream.</p>
+                 <button id="join-live-btn" class="btn-danger" onclick="joinLiveStream()">▶ JOIN LIVE STREAM</button>
+             </div>
+        </div>
+
+        <div id="user-video-container" style="display:none; margin-top:20px; border:2px solid #00ff41;">
+            <div style="background:black; padding:5px; color:white;">LIVE FEED</div>
+            <video id="remote-video" autoplay playsinline style="width:100%; height:300px; background:#000;"></video>
+        </div>
+    </div>
+
+    <div id="profile-section" class="hidden-section">
+        <h2 style="color:#00ff41; text-align:center;">👤 MY OPERATIVE PROFILE</h2>
+        
+        <div class="card" style="border:1px solid #00ff41;">
+            <div class="card-content">
+                <div style="text-align:center; margin-bottom:15px;">
+                    <img id="profile-preview-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:100px; height:100px; border-radius:50%; border:3px solid #00ff41; object-fit:cover;">
+                </div>
+
+                <label>AGENT NAME:</label>
+                <input type="text" id="profile-name" placeholder="Enter Name">
+                
+                <label>USER ID (Unique):</label>
+                <input type="text" id="profile-id" placeholder="Enter User ID" disabled style="color:#666; border-color:#333;">
+
+                <label>DATE OF BIRTH:</label>
+                <input type="date" id="profile-dob" style="color-scheme:dark;">
+
+                <label>PROFILE PHOTO URL:</label>
+                <input type="text" id="profile-photo-url" placeholder="https://example.com/myphoto.jpg" oninput="previewPhoto(this.value)">
+
+                <button class="btn-main" onclick="saveUserProfile()">💾 SAVE PROFILE DATA</button>
+                <p style="font-size:12px; color:#666; text-align:center; margin-top:10px;">Data is saved securely in Firebase Database.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="commands-section" class="hidden-section">
         <h3 style="color:#00ff41;">⌨️ Terminal Commands</h3>
         <div id="commands-list"></div>
     </div>
 
     <div id="prime-section" class="hidden-section">
-        <h2 style="color:gold; text-align:center;">👑 Prime Membership</h2>
-        
+        <h2 style="color:gold; text-align:center;">👑 Prime Zone</h2>
         <div id="prime-locked" style="text-align:center; padding:30px; border:1px solid red; margin-top:20px;">
             <i class="fas fa-lock fa-3x" style="color:red; margin-bottom:15px;"></i>
             <p>Exclusive PDFs & Videos are locked.</p>
             <button class="btn-gold" style="margin-top:15px;">Upgrade - ₹499</button>
         </div>
-
         <div id="prime-unlocked" style="display:none;">
             <h4 style="color:gold;">🔓 Exclusive Content</h4>
             <div id="prime-grid"></div>
@@ -82,25 +137,28 @@
     <div id="admin-section" class="hidden-section">
         <h2 style="color:red; text-align:center;">⚠️ COMMAND CENTER</h2>
         
-        <div class="card" style="border:1px dashed red;">
+        <div class="card" style="border:2px dashed red; background:#110000;">
             <div class="card-content">
-                <h3>🔴 Live Stream Studio</h3>
-                <video id="admin-live-preview" autoplay playsinline style="width:100%; height:200px; background:black; border:1px solid #333; margin-bottom:10px;"></video>
+                <h3>🔴 Live Stream Studio (Real)</h3>
+                <video id="admin-local-video" autoplay playsinline muted style="width:100%; height:200px; background:#000; border:1px solid #333; margin-bottom:10px;"></video>
                 
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-main" onclick="startCamera()">🎥 Camera</button>
-                    <button class="btn-gold" onclick="startScreen()">💻 Screen</button>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button class="btn-main" onclick="setupAdminStream('camera')">1️⃣ Start Camera</button>
+                    <button class="btn-gold" onclick="setupAdminStream('screen')">1️⃣ Start Screen</button>
                 </div>
                 
-                <input type="text" id="live-msg-input" placeholder="Broadcast Message..." style="margin-top:10px;">
-                <button class="btn-danger" onclick="triggerGoLive()">GO LIVE NOW</button>
-                <p style="font-size:12px;">Used: <span id="live-count">0</span>/3</p>
+                <p id="stream-status" style="color:orange; font-size:12px;">Status: Waiting for input...</p>
+                
+                <input type="text" id="live-msg-input" placeholder="Enter Class Topic (e.g. Termux Basics)">
+                <button class="btn-danger" onclick="goLiveOnFirebase()" style="padding:15px;">2️⃣ GO LIVE (BROADCAST)</button>
+                <button class="btn-main" onclick="stopLive()" style="background:#333; color:white; margin-top:10px;">⏹ STOP LIVE</button>
+                <p style="font-size:12px;">Limit: <span id="live-count">0</span>/3 today</p>
             </div>
         </div>
 
         <div class="card" style="border:1px solid #00ff41;">
             <div class="card-content">
-                <h3>🛠 Upload Tool (Home)</h3>
+                <h3>🛠 Upload Tool</h3>
                 <input type="text" id="tool-name" placeholder="Tool Name">
                 <input type="text" id="tool-img" placeholder="Image URL">
                 <input type="text" id="tool-vid" placeholder="YouTube Video ID">
@@ -108,29 +166,15 @@
                 <button class="btn-main" onclick="uploadTool()">UPLOAD TOOL</button>
             </div>
         </div>
-
-        <div class="card" style="border:1px solid cyan;">
-            <div class="card-content">
-                <h3>⌨️ Upload Command</h3>
-                <input type="text" id="cmd-title" placeholder="Command Title (e.g. WiFi Hack)">
-                <textarea id="cmd-text" placeholder="apt update && apt upgrade..." style="font-family:monospace; color:#0f0;"></textarea>
-                <button class="btn-main" style="background:cyan; color:black;" onclick="uploadCommand()">SAVE COMMAND</button>
-            </div>
-        </div>
-
         <div class="card" style="border:1px solid gold;">
-            <div class="card-content">
+             <div class="card-content">
                 <h3>👑 Upload Prime Content</h3>
-                <input type="text" id="prime-title" placeholder="Title (PDF/Video Name)">
-                <input type="text" id="prime-link" placeholder="Link (Drive/YouTube URL)">
-                <select id="prime-type" style="width:100%; padding:10px; background:black; color:white; border:1px solid #333; margin:10px 0;">
-                    <option value="pdf">PDF Document</option>
-                    <option value="video">Private Video</option>
-                </select>
-                <button class="btn-gold" onclick="uploadPrime()">UPLOAD TO PRIME</button>
+                <input type="text" id="prime-title" placeholder="Title">
+                <input type="text" id="prime-link" placeholder="Link">
+                <select id="prime-type" style="background:black; color:white; padding:10px; width:100%; margin:10px 0;"><option value="pdf">PDF</option><option value="video">Video</option></select>
+                <button class="btn-gold" onclick="uploadPrime()">UPLOAD PRIME</button>
             </div>
         </div>
-
     </div>
 
   </div>
