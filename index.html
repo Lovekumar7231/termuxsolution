@@ -6,327 +6,119 @@
 <title>Termux Hacking Family</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<style>
-    /* Header Profile Icon */
-    .profile-icon-header {
-        width: 40px; height: 40px; 
-        border-radius: 50%; 
-        border: 2px solid #00ff41; 
-        cursor: pointer; 
-        object-fit: cover;
-        background: #000;
-    }
-    header {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 10px 15px; background: #000; border-bottom: 1px solid #333;
-    }
-    .logo-area { display: flex; align-items: center; gap: 10px; }
-
-    /* Active User Box */
-    .active-user-box {
-        background: #0a290a;
-        border: 1px solid #00ff41;
-        padding: 10px;
-        border-radius: 5px;
-        color: #00ff41;
-        font-weight: bold;
-        text-align: center;
-        margin-top: 10px;
-        box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
-    }
-    
-    /* Profile Inputs */
-    .profile-input {
-        width: 95%;
-        padding: 10px;
-        margin: 5px 0 15px 0;
-        background: #222;
-        border: 1px solid #444;
-        color: white;
-        border-radius: 4px;
-        outline: none;
-    }
-</style>
 </head>
 
 <body onload="checkGlobalLoginState()">
+
+  <div id="live-banner" class="live-banner" style="display:none;">
+      <div class="live-ring">
+          <img src="https://via.placeholder.com/40" alt="Admin">
+      </div>
+      <div class="live-text">
+          <strong>Admin is Live:</strong> <span id="live-msg-text">Important Update!</span>
+      </div>
+      <button onclick="closeLive()" class="close-live-btn">&times;</button>
+  </div>
 
   <header>
     <div class="logo-area">
         <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon-header" id="headerProfileImg" onclick="showSection('profile')">
         <div class="logo">Termux Family</div>
     </div>
-    <div class="menu-icon" onclick="openNav()" style="font-size:24px; cursor:pointer;">☰</div>
+    <div class="menu-icon" onclick="openNav()">☰</div>
   </header>
 
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <a onclick="showSection('home')">🏠 Home</a>
     <a onclick="showSection('profile')">👤 My Profile</a>
-    <a onclick="showSection('commands')">⌨️ Commands</a>
-    <a onclick="showSection('about')">ℹ️ About</a>
+    <a onclick="showSection('commands')">KB Tools & Scripts</a>
+    <a onclick="showSection('prime')">👑 Prime Zone</a>
     
+    <div id="admin-link" style="display:none;">
+        <a onclick="showSection('admin')" style="color:red;">⚠️ Admin Panel</a>
+    </div>
+
     <div id="loggedOutLinks">
         <a href="login.html" style="color: gold;">🔑 Login</a>
         <a href="signup.html" style="color: gold;">📝 Signup</a>
     </div>
-
     <div id="loggedInLinks" style="display:none;">
-        <a onclick="logout()" style="color: #ff0055; font-weight:bold; border-top:1px solid #333;">🚪 Logout System</a>
+        <a onclick="logout()" style="color: #ff0055; font-weight:bold;">🚪 Logout</a>
     </div>
   </div>
 
 <div class="container">
 
   <div id="home-section" class="hidden-section">
-    <h3>🔴 Live Hacking Class <span class="live-tag">LIVE</span></h3>
-
-    <div class="card">
-      <h4>Join Live Session</h4>
-      <button class="btn btn-prime" onclick="openLiveDashboard()">JOIN LIVE NOW</button>
-    </div>
-
-    <div class="card">
-      <h4>🎁 Free Membership</h4>
-      <p>Limited chat & announcements</p>
-      
-      <button class="btn" id="freeJoinBtn" onclick="location.href='login.html'">Login to Join</button>
-      
-      <div id="activeUserDisplay" class="active-user-box" style="display:none;">
-          Verified Agent: <span id="homeAgentName"></span> ✅<br>
-          <span style="font-size:12px; color:#ccc;">Status: Active</span>
-      </div>
-    </div>
-
-    <div class="card prime-card-border">
-      <h4>👑 Prime Membership</h4>
-      <p>Full live + premium access</p>
-      <button class="btn btn-prime" onclick="showSection('prime')">View Prime</button>
-    </div>
-  </div>
-
-  <div id="profile-section" class="hidden-section" style="display:none; text-align:center; padding-top: 20px;">
-    <h2 class="glitch" style="color:#00ff41; margin-bottom: 20px;">AGENT PROFILE</h2>
-    <div class="card" style="border: 1px solid #00ff41; background: #111; max-width: 400px; margin: auto;">
-        
-        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" id="mainProfileImg" style="width: 100px; height: 100px; margin-bottom: 15px; border: 3px solid #00ff41; border-radius: 50%; object-fit: cover;">
-        
-        <h3 id="profileNameDisplay" style="color: white; text-transform: uppercase;">GUEST USER</h3>
-        <p style="color: #888;">Status: <span style="color: gold;">ROOKIE</span> | DD: <span id="profileDDDisplay">--/--</span></p>
-        
-        <div style="margin-top: 20px; border-top: 1px dashed #333; padding-top: 15px; text-align: left;">
-            <h4 style="color: #00ff41;">🛠 Update Profile:</h4>
-            
-            <label style="color:#888; font-size:12px;">Codename:</label>
-            <input type="text" id="editName" class="profile-input" placeholder="Change Name">
-            
-            <label style="color:#888; font-size:12px;">Date of Birth (DD/MM):</label>
-            <input type="text" id="editDD" class="profile-input" placeholder="e.g. 15/08">
-            
-            <label style="color:#888; font-size:12px;">Upload Photo (From Gallery):</label>
-            <input type="file" id="fileInput" accept="image/*" style="background: #333; color: white; padding: 10px; width: 95%; border-radius: 5px;">
-            
-            <button onclick="saveProfileData()" class="btn" style="background: #00ff41; color: black; width: 100%; margin-top: 15px; font-weight: bold;">SAVE CHANGES</button>
+    <h3>Latest Tools & Updates</h3>
+    <div id="tools-grid" class="grid-container">
         </div>
-
-        <button class="btn" onclick="showSection('home')" style="margin-top: 20px;">BACK HOME</button>
-    </div>
   </div>
 
-  <div id="prime-section" class="hidden-section" style="display:none; text-align:center;">
-      <h2 class="glitch" style="margin-top:20px; color:#ff0055;">CHOOSE PLAN</h2>
-      <div class="card prime-card-border">
-          <div style="display: flex; flex-direction: column; gap: 15px;">
-              <button class="btn btn-prime">1 Month - ₹499</button>
-              <button class="btn btn-prime" style="background:gold; color:black;">3 Months - ₹1099</button>
-              <button class="btn btn-prime">6 Months - ₹2099</button>
+  <div id="article-viewer" class="modal" style="display:none;">
+      <div class="modal-content">
+          <span class="close-modal" onclick="closeArticle()">&times;</span>
+          <h2 id="view-title" style="color:#00ff41;">Tool Name</h2>
+          <img id="view-img" src="" alt="Tool" style="width:100%; height:200px; object-fit:cover; border-radius:5px;">
+          
+          <h3 style="color:white; margin-top:10px;">Commands & Guide:</h3>
+          <p id="view-desc" style="color:#ccc; white-space: pre-line;">Loading...</p>
+          
+          <div class="video-box" style="margin-top:15px;">
+              <h3 style="color:gold;">Practical Video:</h3>
+              <iframe id="view-video" width="100%" height="250" src="" frameborder="0" allowfullscreen></iframe>
           </div>
-          <button class="btn" onclick="showSection('home')" style="margin-top:20px;">⬅ Back</button>
       </div>
   </div>
 
-  <div id="commands-section" class="hidden-section" style="display:none;">
-      <h2 style="color: #00ff00;">⌨️ Termux Tools</h2>
-      <div class="card">
-          <input type="text" placeholder="🔍 Search tool name..." style="width: 100%; padding: 12px; background: #1a1a1a; color: #00ff00; border: 1px solid #00ff00;">
-      </div>
-      <p style="color:#666; text-align:center; margin-top:20px;">(Tools list loading...)</p>
+  <div id="admin-section" class="hidden-section" style="display:none;">
+      <h2 style="color:red;">⚠️ ADMIN CONTROL ROOM</h2>
       
-      <div id="admin-panel" style="display:none; border: 1px dashed red; padding: 10px; margin-top: 20px;">
-          <h3 style="color:red;">⚠️ ADMIN CONTROL</h3>
-          <p>You can upload tools here (Connect Firebase for real upload)</p>
-          <button class="btn" style="background:red; color:white;">UPLOAD TOOL</button>
+      <div class="card" style="border-color:red;">
+          <h3>🔴 Go Live (Limit: 3/Day)</h3>
+          <input type="text" id="live-msg-input" class="profile-input" placeholder="Enter Live Message">
+          <button class="btn" style="background:red; color:white;" onclick="triggerLive()">GO LIVE NOW</button>
+          <p style="font-size:12px; color:#888;">Used: <span id="live-count-display">0</span>/3</p>
       </div>
 
-      <button class="btn" onclick="showSection('home')" style="margin-top:20px;">BACK TO HOME</button>
+      <div class="card" style="border-color:#00ff41;">
+          <h3>🛠 Upload New Tool</h3>
+          <input type="text" id="new-tool-title" class="profile-input" placeholder="Tool Name">
+          <textarea id="new-tool-desc" class="profile-input" placeholder="Commands / Steps..."></textarea>
+          <input type="text" id="new-tool-img" class="profile-input" placeholder="Image URL">
+          <input type="text" id="new-tool-video" class="profile-input" placeholder="YouTube Video ID (e.g. dQw4w9WgXcQ)">
+          <button class="btn" onclick="uploadNewTool()">UPLOAD TO HOME</button>
+      </div>
   </div>
 
-  <div id="about-section" class="hidden-section" style="display:none;">
+  <div id="prime-section" class="hidden-section" style="display:none;">
+      <h2 class="glitch" style="color:gold;">👑 PRIME MEMBERSHIP</h2>
+      <div id="prime-content-locked">
+          <div class="card prime-card-border">
+              <p>Join Prime to access Private Tools, Number & Live Classes.</p>
+              <button class="btn btn-prime">Buy Membership - ₹499</button>
+          </div>
+      </div>
+      <div id="prime-content-unlocked" style="display:none;">
+          <div class="card" style="border:1px solid gold;">
+             <h3>📞 Admin Personal Number</h3>
+             <p style="color:#00ff41; font-size:20px;">+91 7231860034</p>
+          </div>
+      </div>
+  </div>
+
+  <div id="profile-section" class="hidden-section" style="display:none;">
+    <h2 style="color:#00ff41;">My Profile</h2>
     <div class="card">
-      <h3>About Us</h3>
-      <div class="about-links" style="margin: 20px 0; text-align: left;">
-        <p><i class="fab fa-telegram" style="color: #0088cc; width: 30px;"></i> <a href="https://t.me/Termuxcommandsi" style="color: #3399ff;">Telegram Channel</a></p>
-        <p><i class="fab fa-youtube" style="color: #ff0000; width: 30px;"></i> <a href="https://youtube.com/@termuxhacking0" style="color: #3399ff;">YouTube</a></p>
-        <p><i class="fab fa-instagram" style="color: #e4405f; width: 30px;"></i> <a href="https://www.instagram.com/termux_solution" style="color: #3399ff;">Instagram</a></p>
-        
-        <p><i class="fab fa-facebook" style="color: #1877F2; width: 30px;"></i> <a href="https://www.facebook.com/share/1CFBbZmAya/" target="_blank" style="color: #3399ff;">Facebook Page</a></p>
-        <p><i class="fab fa-x-twitter" style="color: #ffffff; width: 30px;"></i> <a href="https://x.com/termux_solution?t=BTJ-pgNxnL_P0WpBw-_zpg&s=09" target="_blank" style="color: #3399ff;">X (Twitter)</a></p>
-        
-        <div id="mobile-box" style="background: #1a1a1a; padding: 12px; margin-top: 15px; border-radius: 8px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
-            <span id="number-text" style="color: #888;">Mobile: +91 **********</span>
-            <button onclick="handleUnlock()" style="background: #28a745; border: none; padding: 5px 10px; color: white; border-radius: 5px; cursor: pointer;">Unlock</button>
-        </div>
-      </div>
-      <button class="btn" onclick="showSection('home')">Back Home</button>
+        <h3 id="profileNameDisplay">Guest</h3>
+        <button class="btn" onclick="logout()">Logout</button>
     </div>
   </div>
 
-</div>
-
-<div id="live-dashboard-section" style="display:none; position:fixed; inset:0; background:black; z-index:9999; flex-direction:column;">
-    <div style="padding:15px; border-bottom:1px solid #00ff41; display:flex; justify-content:space-between; background:#111;">
-        <span style="color:red; font-weight:bold;">● LIVE WAR ROOM</span>
-        <button onclick="closeLiveDashboard()" style="background:transparent; color:#00ff41; border:1px solid #00ff41; padding:5px 10px;">EXIT</button>
-    </div>
-    <div style="flex:1; display:flex; align-items:center; justify-content:center;">
-        <h3 style="color:white;">WAITING FOR HOST...</h3>
-    </div>
 </div>
 
 <script src="script.js"></script>
-
-<script>
-    // --- MASTER LOGIC ---
-
-    function checkGlobalLoginState() {
-        showSection('home'); 
-        
-        const agentName = localStorage.getItem("agentName");
-        const isAdmin = localStorage.getItem("isAdmin"); // Admin Check
-        const agentPhoto = localStorage.getItem("agentPhoto");
-        const agentDD = localStorage.getItem("agentDD");
-
-        if (agentName) {
-            // USER LOGGED IN
-            document.getElementById("loggedOutLinks").style.display = "none";
-            document.getElementById("loggedInLinks").style.display = "block";
-            
-            // Home Page
-            document.getElementById("freeJoinBtn").style.display = "none";
-            document.getElementById("activeUserDisplay").style.display = "block";
-            document.getElementById("homeAgentName").innerText = agentName;
-
-            // Admin Logic (Red Color)
-            if (isAdmin === "true") {
-                document.getElementById("homeAgentName").style.color = "red";
-                document.getElementById("homeAgentName").innerText = agentName + " (ADMIN)";
-                // Show Admin Panel
-                const p = document.getElementById("admin-panel");
-                if(p) p.style.display = "block";
-            }
-
-            // Profile Info
-            document.getElementById("profileNameDisplay").innerText = "AGENT " + agentName;
-            document.getElementById("editName").value = agentName;
-            
-            if(agentDD) {
-                document.getElementById("profileDDDisplay").innerText = agentDD;
-                document.getElementById("editDD").value = agentDD;
-            }
-
-            // Photo
-            if (agentPhoto) {
-                document.getElementById("headerProfileImg").src = agentPhoto;
-                document.getElementById("mainProfileImg").src = agentPhoto;
-            }
-
-        } else {
-            // GUEST
-            document.getElementById("loggedOutLinks").style.display = "block";
-            document.getElementById("loggedInLinks").style.display = "none";
-            document.getElementById("freeJoinBtn").style.display = "inline-block";
-            document.getElementById("activeUserDisplay").style.display = "none";
-            
-            // Hide Admin Panel
-            const p = document.getElementById("admin-panel");
-            if(p) p.style.display = "none";
-        }
-    }
-
-    function saveProfileData() {
-        if(!localStorage.getItem("agentName")) {
-            alert("⚠️ Please Login first!");
-            location.href = "login.html";
-            return;
-        }
-
-        const newName = document.getElementById("editName").value;
-        const newDD = document.getElementById("editDD").value;
-        const fileInput = document.getElementById("fileInput");
-
-        if(newName) localStorage.setItem("agentName", newName);
-        if(newDD) localStorage.setItem("agentDD", newDD);
-
-        if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const base64Img = e.target.result;
-                localStorage.setItem("agentPhoto", base64Img);
-                document.getElementById("mainProfileImg").src = base64Img;
-                document.getElementById("headerProfileImg").src = base64Img;
-                checkGlobalLoginState(); 
-                alert("✅ Photo & Details Updated!");
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        } else {
-            checkGlobalLoginState();
-            alert("✅ Details Updated!");
-        }
-    }
-
-    function showSection(sectionId) {
-        if(sectionId === 'profile' && !localStorage.getItem("agentName")) {
-            alert("🔒 Login Required for Profile!");
-            location.href = "login.html";
-            return;
-        }
-        document.querySelectorAll('.hidden-section').forEach(sec => sec.style.display = 'none');
-        const target = document.getElementById(sectionId + '-section');
-        if(target) target.style.display = 'block';
-        closeNav();
-    }
-    
-    function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
-    function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
-    function openLiveDashboard() { document.getElementById('live-dashboard-section').style.display = 'flex'; }
-    function closeLiveDashboard() { document.getElementById('live-dashboard-section').style.display = 'none'; }
-
-    function logout() {
-        if(confirm("Logout from System?")) {
-            localStorage.clear();
-            location.href = "login.html";
-        }
-    }
-
-    // 👇 PHONE NUMBER UNLOCK LOGIC
-    function handleUnlock() {
-        const isAdmin = localStorage.getItem("isAdmin");
-        
-        // सिर्फ़ Admin ही नंबर देख सकता है
-        if(isAdmin === "true") {
-            document.getElementById("number-text").innerText = "Mobile: +91 7231860034";
-            document.getElementById("number-text").style.color = "#00ff41";
-            document.getElementById("number-text").style.fontWeight = "bold";
-            alert("🔓 Premium Access: Number Unlocked!");
-        } else {
-            // अगर नॉर्मल यूजर है
-            if(confirm("🔒 This number is for Prime Members only.\n\nDo you want to buy Prime Membership?")) {
-                showSection('prime');
-            }
-        }
-    }
-</script>
-
 </body>
 </html>
 
