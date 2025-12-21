@@ -1,147 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Termux Hacking Family</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        // Apna Config Same Rakhein
-        const firebaseConfig = {
-            apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
-            authDomain: "termuxhacking-aac55.firebaseapp.com",
-            projectId: "termuxhacking-aac55",
-            storageBucket: "termuxhacking-aac55.firebasestorage.app",
-            messagingSenderId: "921781091312",
-            appId: "1:921781091312:web:39a1b96ceda5bc60b83b35"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        window.db = db;
-        window.dbRef = ref;
-        window.dbPush = push;
-        window.dbOnValue = onValue;
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termux Hacking Family</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    window.dbConfig = {
+        apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
+        authDomain: "termuxhacking-aac55.firebaseapp.com",
+        projectId: "termuxhacking-aac55",
+        storageBucket: "termuxhacking-aac55.firebasestorage.app",
+        messagingSenderId: "921781091312",
+        appId: "1:921781091312:web:39a1b96ceda5bc60b83b35"
+    };
+    const app = initializeApp(window.dbConfig);
+    const db = getDatabase(app);
+    window.db = db; window.dbRef = ref; window.dbPush = push; window.dbOnValue = onValue;
+</script>
 </head>
 <body onload="initApp()">
 
-    <div class="container">
-        <div id="live-banner" class="live-banner">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <i class="fas fa-satellite-dish fa-spin"></i>
-                <span><strong>ADMIN LIVE:</strong> <span id="live-msg-text">Welcome!</span></span>
-            </div>
-            <button onclick="document.getElementById('live-banner').style.display='none'" style="background:none; color:white;">&times;</button>
-        </div>
+  <div class="container">
+      <div id="live-banner" class="live-banner">
+          <div style="display:flex; align-items:center; gap:10px;">
+              <i class="fas fa-video fa-spin" style="color:white;"></i>
+              <span><strong>ADMIN IS LIVE</strong></span>
+          </div>
+          <button onclick="document.getElementById('live-banner').style.display='none'" style="background:none; color:white;">&times;</button>
+      </div>
+  </div>
+
+  <header>
+    <div class="logo-area">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon-header">
+        <div class="logo" style="margin-left:10px;">Termux Family <span id="admin-badge" style="display:none; color:red;">(ADMIN)</span></div>
+    </div>
+    <div class="menu-icon" onclick="openNav()">☰</div>
+  </header>
+
+  <div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <a onclick="showSection('home')">🏠 Home</a>
+    <a onclick="showSection('commands')">⌨️ Commands</a>
+    <a onclick="showSection('prime')">👑 Prime Zone</a>
+    <div id="admin-link" style="display:none;"><a onclick="showSection('admin')" style="color:red;">⚠️ Admin Panel</a></div>
+    <div id="loggedOutLinks"><a href="login.html" style="color:gold;">🔑 Login</a></div>
+    <div id="loggedInLinks" style="display:none;"><a onclick="logout()" style="color:#ff0055;">🚪 Logout</a></div>
+  </div>
+
+  <div class="container">
+
+    <div id="home-section" class="hidden-section" style="display:block;">
+        <h3>🔥 Latest Tools</h3>
+        <div id="tools-grid"></div>
     </div>
 
-    <header>
-        <div class="logo-area">
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-icon-header" id="headerProfileImg">
-            <div class="logo-text" style="font-weight:bold; margin-left:10px;">
-                Termux Family <span id="admin-badge" style="display:none; color:red; font-size:10px;">(ADMIN)</span>
-            </div>
-        </div>
-        <div class="menu-icon" onclick="openNav()">☰</div>
-    </header>
+    <div id="commands-section" class="hidden-section">
+        <h3 style="color:#00ff41;">⌨️ Terminal Commands</h3>
+        <div id="commands-list"></div>
+    </div>
 
-    <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a onclick="showSection('home')">🏠 Home</a>
-        <a onclick="showSection('prime')">👑 Prime Zone</a>
-        <div id="admin-link" style="display:none;"><a onclick="showSection('admin')" style="color:red;">⚠️ Admin Panel</a></div>
+    <div id="prime-section" class="hidden-section">
+        <h2 style="color:gold; text-align:center;">👑 Prime Membership</h2>
         
-        <div id="loggedOutLinks">
-            <a href="login.html" style="color: gold;">🔑 Login</a>
-            <a href="signup.html" style="color: gold;">📝 Signup</a>
-        </div>
-        <div id="loggedInLinks" style="display:none;">
-            <a onclick="logout()" style="color: #ff0055;">🚪 Logout</a>
-        </div>
-    </div>
-
-    <div class="container">
-
-        <div id="home-section" class="hidden-section" style="display:block;">
-            <h3>🔥 Latest Tools</h3>
-            <div id="tools-loader" style="text-align:center; color:#666;">Loading Tools...</div>
-            <div id="tools-grid"></div>
+        <div id="prime-locked" style="text-align:center; padding:30px; border:1px solid red; margin-top:20px;">
+            <i class="fas fa-lock fa-3x" style="color:red; margin-bottom:15px;"></i>
+            <p>Exclusive PDFs & Videos are locked.</p>
+            <button class="btn-gold" style="margin-top:15px;">Upgrade - ₹499</button>
         </div>
 
-        <div id="prime-section" class="hidden-section">
-            <h2 style="color:gold; text-align:center;">👑 PRIME ZONE</h2>
-            
-            <div id="prime-locked" style="text-align:center; border:1px solid #ff0055; padding:20px;">
-                <i class="fas fa-lock fa-3x" style="color:#ff0055; margin-bottom:10px;"></i>
-                <p>Exclusive Content for Prime Members Only.</p>
-                <button class="btn-gold">Join Prime - ₹499</button>
-            </div>
-
-            <div id="prime-unlocked" style="display:none;">
-                <div class="card" style="border-color:gold;">
-                    <div class="card-content">
-                        <h4>📂 Secret PDF Guide</h4>
-                        <button class="btn-gold">Download</button>
-                    </div>
-                </div>
-                <div class="card" style="border-color:gold;">
-                    <div class="card-content">
-                        <h4>🎥 Private Hacking Class</h4>
-                        <button class="btn-gold">Watch Video</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="admin-section" class="hidden-section">
-            <h2 style="color:red; text-align:center;">⚠️ COMMAND CENTER</h2>
-            
-            <div class="card" style="border:1px dashed red;">
-                <div class="card-content">
-                    <h3>🔴 Go Live (Limit 3)</h3>
-                    <input type="text" id="live-msg-input" placeholder="Broadcast Message...">
-                    <button class="btn-danger" onclick="triggerGoLive()">GO LIVE</button>
-                    <p style="font-size:12px;">Used: <span id="live-count">0</span>/3</p>
-                </div>
-            </div>
-
-            <div class="card" style="border:1px solid #00ff41;">
-                <div class="card-content">
-                    <h3>🛠 Upload Tool</h3>
-                    <input type="text" id="tool-name" placeholder="Tool Name">
-                    <input type="text" id="tool-img" placeholder="Image URL">
-                    <input type="text" id="tool-vid" placeholder="YouTube Video ID (e.g. dQw4w9WgXcQ)">
-                    <textarea id="tool-desc" rows="4" placeholder="Commands..."></textarea>
-                    <button class="btn-main" onclick="uploadTool()">UPLOAD</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div id="articleModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title" style="color:#00ff41;">Tool Name</h2>
-            <img id="modal-img" src="" style="width:100%; height:200px; object-fit:cover; border-radius:5px;">
-            
-            <h4 style="color:gold; margin-top:15px;">📝 Commands:</h4>
-            <div id="modal-desc" style="background:#000; padding:10px; white-space: pre-wrap; color:#ccc; font-family:monospace;"></div>
-            
-            <h4 style="color:#ff0055; margin-top:15px;">🎥 Video Tutorial:</h4>
-            <div id="modal-video-container">
-                <iframe id="modal-video" width="100%" height="250" src="" frameborder="0" allowfullscreen></iframe>
-            </div>
+        <div id="prime-unlocked" style="display:none;">
+            <h4 style="color:gold;">🔓 Exclusive Content</h4>
+            <div id="prime-grid"></div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="admin-section" class="hidden-section">
+        <h2 style="color:red; text-align:center;">⚠️ COMMAND CENTER</h2>
+        
+        <div class="card" style="border:1px dashed red;">
+            <div class="card-content">
+                <h3>🔴 Live Stream Studio</h3>
+                <video id="admin-live-preview" autoplay playsinline style="width:100%; height:200px; background:black; border:1px solid #333; margin-bottom:10px;"></video>
+                
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-main" onclick="startCamera()">🎥 Camera</button>
+                    <button class="btn-gold" onclick="startScreen()">💻 Screen</button>
+                </div>
+                
+                <input type="text" id="live-msg-input" placeholder="Broadcast Message..." style="margin-top:10px;">
+                <button class="btn-danger" onclick="triggerGoLive()">GO LIVE NOW</button>
+                <p style="font-size:12px;">Used: <span id="live-count">0</span>/3</p>
+            </div>
+        </div>
+
+        <div class="card" style="border:1px solid #00ff41;">
+            <div class="card-content">
+                <h3>🛠 Upload Tool (Home)</h3>
+                <input type="text" id="tool-name" placeholder="Tool Name">
+                <input type="text" id="tool-img" placeholder="Image URL">
+                <input type="text" id="tool-vid" placeholder="YouTube Video ID">
+                <textarea id="tool-desc" placeholder="Description..."></textarea>
+                <button class="btn-main" onclick="uploadTool()">UPLOAD TOOL</button>
+            </div>
+        </div>
+
+        <div class="card" style="border:1px solid cyan;">
+            <div class="card-content">
+                <h3>⌨️ Upload Command</h3>
+                <input type="text" id="cmd-title" placeholder="Command Title (e.g. WiFi Hack)">
+                <textarea id="cmd-text" placeholder="apt update && apt upgrade..." style="font-family:monospace; color:#0f0;"></textarea>
+                <button class="btn-main" style="background:cyan; color:black;" onclick="uploadCommand()">SAVE COMMAND</button>
+            </div>
+        </div>
+
+        <div class="card" style="border:1px solid gold;">
+            <div class="card-content">
+                <h3>👑 Upload Prime Content</h3>
+                <input type="text" id="prime-title" placeholder="Title (PDF/Video Name)">
+                <input type="text" id="prime-link" placeholder="Link (Drive/YouTube URL)">
+                <select id="prime-type" style="width:100%; padding:10px; background:black; color:white; border:1px solid #333; margin:10px 0;">
+                    <option value="pdf">PDF Document</option>
+                    <option value="video">Private Video</option>
+                </select>
+                <button class="btn-gold" onclick="uploadPrime()">UPLOAD TO PRIME</button>
+            </div>
+        </div>
+
+    </div>
+
+  </div>
+
+  <div id="articleModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 id="modal-title" style="color:#00ff41;">Title</h2>
+        <img id="modal-img" src="" style="width:100%; height:200px; object-fit:cover;">
+        <div id="modal-desc" style="background:black; padding:10px; margin:10px 0; white-space:pre-wrap; font-family:monospace; color:#ccc;"></div>
+        <div id="modal-video-container"><iframe id="modal-video" width="100%" height="250" frameborder="0"></iframe></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
 
