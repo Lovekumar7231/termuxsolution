@@ -27,3 +27,7 @@ CREATE TABLE termux_tools (
     tool_name VARCHAR(255) NOT NULL,
     tool_commands TEXT NOT NULL
 );
+
+ALTER TABLE termux_tools ADD COLUMN tool_img VARCHAR(255) DEFAULT 'https://via.placeholder.com/300';
+ALTER TABLE termux_tools ADD COLUMN tool_video VARCHAR(255) DEFAULT '';
+ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT 'user';
