@@ -8,6 +8,7 @@
     
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
+       // अपना EmailJS Public Key यहाँ डालें
        (function(){ emailjs.init("ijs5TFBMM18XzlFac"); })();
     </script>
 </head>
@@ -30,99 +31,110 @@
         <div class="input-group" style="border:1px dashed #00ff41; padding:10px;">
             <label style="color:gold;">SECURITY CHECK</label>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                <span id="captcha-question" style="color:white; font-size:18px; font-weight:bold; letter-spacing:2px;">5 + 3 = ?</span>
-                <input type="number" id="captcha-input" placeholder="?" style="width:60px; text-align:center; margin:0;">
+                <span id="captcha-question" style="color:white; font-size:18px; font-weight:bold;"></span>
+                <input type="number" id="captcha-input" placeholder="?" style="width:60px; text-align:center;">
             </div>
         </div>
 
-        <button onclick="handleLogin()">EXECUTE LOGIN</button>
+        <button id="loginBtn" onclick="handleLogin()">EXECUTE LOGIN</button>
         
-        <div style="margin-top:15px; font-size:12px; display:flex; justify-content:space-between;">
-            <a href="forgot_password.html" style="color:#ff0055;">Forgot Password?</a>
-            <a href="signup.html" style="color:#00ff41;">Create Account</a>
+        <div style="margin-top:15px; font-size:12px;">
+            <a href="signup.html" style="color:#00ff41;">Create New Account</a>
         </div>
     </div>
 
     <div id="otp-form" style="display:none;">
-        <p style="color:gold; font-weight:bold;">⚠️ COMMANDER DETECTED</p>
-        <p style="font-size:12px; color:#ccc; margin-bottom:10px;">OTP Sent to termuxhacking72@gmail.com</p>
+        <p style="color:red; font-weight:bold; animation: blink 1s infinite;">⚠️ ADMIN DETECTED</p>
+        <p style="font-size:12px; color:#ccc; margin-bottom:10px;">Verification Code sent to Email.</p>
+        
         <div class="input-group">
-            <input type="number" id="adminOtp" placeholder="Enter OTP Code">
+            <label>ENTER OTP CODE</label>
+            <input type="number" id="adminOtp" placeholder="XXXX">
         </div>
         <button onclick="verifyAdminOtp()">UNLOCK SYSTEM</button>
     </div>
 </div>
 
 <script>
-    // --- CAPTCHA LOGIC ---
-    let num1 = Math.floor(Math.random() * 10);
-    let num2 = Math.floor(Math.random() * 10);
-    document.getElementById('captcha-question').innerText = `${num1} + ${num2} = ?`;
+    // --- CAPTCHA SETUP ---
+    let n1 = Math.floor(Math.random() * 10);
+    let n2 = Math.floor(Math.random() * 10);
+    document.getElementById('captcha-question').innerText = `${n1} + ${n2} = ?`;
 
     let generatedOtp = 0;
 
     function handleLogin() {
-        // 1. CAPTCHA CHECK
-        const captchaAns = document.getElementById('captcha-input').value;
-        if(parseInt(captchaAns) !== (num1 + num2)) {
-            alert("❌ Security Check Failed! Wrong Captcha.");
+        const user = document.getElementById('loginUser').value.trim();
+        const pass = document.getElementById('loginPass').value.trim();
+        const captcha = document.getElementById('captcha-input').value;
+
+        // 1. Captcha Check
+        if(parseInt(captcha) !== (n1 + n2)) {
+            alert("❌ Captcha Wrong!");
             return;
         }
 
-        const user = document.getElementById('loginUser').value;
-        const pass = document.getElementById('loginPass').value;
-
-        // 2. ADMIN CHECK (OTP Logic)
+        // 2. ADMIN CHECK (Specific Logic)
+        // यहाँ अपना पासवर्ड चेक करो
         if (user === "Admin" && pass === "Love@728296#$") {
-            
-            // Generate Random OTP
-            generatedOtp = Math.floor(1000 + Math.random() * 9000);
-            
-            // Button Text Change
-            const btn = document.querySelector('button');
-            btn.innerText = "SENDING OTP...";
-            btn.disabled = true;
-
-            // SEND OTP TO YOUR GMAIL
-            emailjs.send("service_idclxul", "template_6sk2up1", {
-                to_email: "termuxhacking72@gmail.com", // TARGET EMAIL
-                name: "Admin",
-                otp_code: generatedOtp
-            }).then(function() {
-                alert("✅ OTP Sent Successfully!");
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('otp-form').style.display = 'block';
-            }, function(error) {
-                alert("❌ OTP Sending Failed. Try Again.");
-                btn.innerText = "EXECUTE LOGIN";
-                btn.disabled = false;
-            });
-
+            sendAdminOTP(); // OTP भेजो
             return;
         }
 
-        // 3. NORMAL USER LOGIN (Direct Login)
-        if(user) {
+        // 3. NORMAL USER LOGIN
+        // (अगर Database Login है तो उसे यहाँ add कर सकते हो, अभी direct access दे रहा हूँ)
+        if(user && user !== "Admin") {
             localStorage.setItem("agentName", user);
             localStorage.setItem("isAdmin", "false");
             alert("✅ Welcome Agent " + user);
             window.location.href = "index.html";
         } else {
-            alert("⚠️ Please Enter Codename!");
+            alert("⚠️ Invalid Username or Password!");
         }
     }
 
+    function sendAdminOTP() {
+        const btn = document.getElementById('loginBtn');
+        btn.innerText = "SENDING OTP...";
+        btn.disabled = true;
+
+        generatedOtp = Math.floor(1000 + Math.random() * 9000);
+
+        // EmailJS Parameters
+        const params = {
+            to_email: "termuxhacking72@gmail.com", // जिस ईमेल पर OTP चाहिए
+            name: "Admin Commander",
+            otp_code: generatedOtp
+        };
+
+        // Service ID और Template ID वही है जो तुमने दी थी
+        emailjs.send("service_idclxul", "template_6sk2up1", params)
+            .then(function() {
+                alert("✅ OTP Sent to Admin Email!");
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('otp-form').style.display = 'block';
+            }, function(error) {
+                alert("❌ Email Error: " + JSON.stringify(error));
+                btn.innerText = "EXECUTE LOGIN";
+                btn.disabled = false;
+            });
+    }
+
     function verifyAdminOtp() {
-        const enteredOtp = document.getElementById('adminOtp').value;
-        if(enteredOtp == generatedOtp) {
-            localStorage.setItem("agentName", "COMMANDER");
-            localStorage.setItem("isAdmin", "true");
+        const entered = document.getElementById('adminOtp').value;
+        if(entered == generatedOtp) {
+            localStorage.setItem("agentName", "Admin");
+            localStorage.setItem("isAdmin", "true"); // यह बहुत ज़रूरी है
             window.location.href = "index.html";
         } else {
-            alert("❌ WRONG OTP! ACCESS DENIED.");
+            alert("❌ WRONG OTP! Access Denied.");
         }
     }
 </script>
+
+<style>
+@keyframes blink { 50% { opacity: 0; } }
+</style>
 
 </body>
 </html>
