@@ -6,14 +6,13 @@
     <title>Termux Hacking Family</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, get, push, onValue, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, get, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // CONFIG (Replace if needed)
+        // Firebase Config
         window.dbConfig = {
             apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
             authDomain: "termuxhacking-aac55.firebaseapp.com",
@@ -45,12 +44,12 @@
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     <a onclick="showSection('home')"><i class="fas fa-home"></i> Home</a>
-    <a onclick="showSection('live')"><i class="fas fa-video"></i> Live Class</a>
+    <a onclick="showSection('about')"><i class="fas fa-info-circle"></i> About Us</a>
     <a onclick="showSection('profile')"><i class="fas fa-user-secret"></i> Profile</a>
     <a onclick="showSection('prime')" style="color:gold;"><i class="fas fa-crown"></i> Prime Zone</a>
     
     <div id="admin-link" style="display:none; border-top:1px solid #333; margin-top:10px;">
-        <p style="color:#666; font-size:12px; padding-left:20px;">ADMIN ACCESS</p>
+        <p style="color:#666; font-size:12px; padding-left:20px; margin-top:10px;">ADMIN ACCESS</p>
         <a onclick="showSection('admin')" style="color:red;"><i class="fas fa-cogs"></i> Admin Panel</a>
     </div>
 
@@ -61,14 +60,57 @@
   <div class="container">
 
     <div id="home-section" class="hidden-section" style="display:block;">
-        
         <div style="margin-bottom: 20px; position:relative;">
-            <input type="text" id="search-input" onkeyup="searchTools()" placeholder="🔍 Search Tool (e.g. Phishing)..." 
+            <input type="text" id="search-input" onkeyup="searchTools()" placeholder="🔍 Search Tool..." 
                 style="padding: 12px 15px; border-radius: 25px; border: 1px solid #00ff41; background: #111; color: white; width: 100%; outline:none;">
         </div>
-
         <h3>🔥 Latest Tools</h3>
         <div id="tools-grid"></div>
+    </div>
+
+    <div id="about-section" class="hidden-section">
+        <h2 style="color:#00ff41; text-align:center;">ℹ️ ABOUT US</h2>
+        
+        <div class="card" style="text-align:center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/2092/2092663.png" style="width:120px; height:120px; margin-bottom:15px; filter: drop-shadow(0 0 10px #00ff41);">
+            <h3 style="color:white;">Termux Hacking Family</h3>
+            <p style="color:#ccc; font-size:14px;">Join our community for ethical hacking tutorials and tools.</p>
+            
+            <div class="social-links">
+                <a href="https://t.me/Termuxcommandsi" target="_blank" class="social-btn tg"><i class="fab fa-telegram"></i> Telegram</a>
+                <a href="https://youtube.com/@termuxhacking0?si=a_bHzlUtcRO2AfIt" target="_blank" class="social-btn yt"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="https://www.instagram.com/termux_solution?igsh=cGM2aTVlY2J6a2c2" target="_blank" class="social-btn ig"><i class="fab fa-instagram"></i> Instagram</a>
+                <a href="https://www.facebook.com/share/17qmJ6McUR/" target="_blank" class="social-btn fb"><i class="fab fa-facebook"></i> Facebook</a>
+                <a href="https://tiktok.com/@termux.solution" target="_blank" class="social-btn tk"><i class="fab fa-tiktok"></i> TikTok</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="prime-section" class="hidden-section">
+        <h2 style="color:gold; text-align:center;">👑 PRIME MEMBERSHIP</h2>
+        <p style="text-align:center; color:#ccc;">Get exclusive Access to Premium Content & Support.</p>
+        <h3 style="text-align:center; color:#00ff41;">Price: ₹399 / Month</h3>
+
+        <div class="card" style="border: 2px solid gold; text-align:center;">
+            <div class="card-content">
+                <i class="fab fa-whatsapp fa-3x" style="color:#25D366; margin-bottom:10px;"></i>
+                <h3>WhatsApp Support</h3>
+                
+                <div id="wa-locked">
+                    <p style="color:red; font-size:12px;">🔒 LOCKED (Prime Members Only)</p>
+                    <p style="filter: blur(4px); user-select: none;">+91 72318 XXXXX</p>
+                    <button class="btn-gold" onclick="alert('Please Pay ₹399 to Unlock!')">UNLOCK NOW</button>
+                </div>
+
+                <div id="wa-unlocked" style="display:none;">
+                    <p style="color:#00ff41; font-weight:bold; font-size:18px;">+91 72318 60034</p>
+                    <a href="https://wa.me/917231860034" target="_blank" class="btn-main" style="background:#25D366; color:white; display:block; text-decoration:none; padding:10px; margin-top:5px;">CHAT NOW</a>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="color:gold; margin-top:20px;">🔓 Prime Content</h3>
+        <div id="prime-grid"></div>
     </div>
 
     <div id="profile-section" class="hidden-section">
@@ -79,7 +121,6 @@
             <br><br>
             <label for="profile-file-input" class="file-btn-label">📸 Change Photo (Gallery)</label>
             <input type="file" id="profile-file-input" accept="image/*" onchange="previewFile('profile-file-input', 'profile-preview-img')">
-            
             <div style="text-align:left; margin-top:20px;">
                 <label>CODENAME:</label> <input type="text" id="profile-name">
                 <label>DOB:</label> <input type="date" id="profile-dob" style="color-scheme:dark;">
@@ -93,36 +134,45 @@
 
         <div class="card" style="border: 1px solid #00ff41;">
             <div class="card-content">
-                <h3 style="color:#00ff41;">🛠 Upload New Tool</h3>
-                <input type="text" id="tool-name" placeholder="Tool Name (e.g. Nmap)">
+                <h3 style="color:#00ff41;">🛠 Upload Tool</h3>
+                <input type="text" id="tool-name" placeholder="Tool Name">
+                <div class="upload-box"><label>Select Image</label><br><input type="file" id="tool-file-input" accept="image/*" style="color:white;"></div>
+                <textarea id="tool-desc" rows="3" placeholder="How to Install..."></textarea>
+                <textarea id="tool-cmds" rows="4" placeholder="Commands..." style="background:#050505; color:#00ff41; font-family:monospace;"></textarea>
+                <input type="text" id="tool-video" placeholder="Video ID">
+                <button class="btn-main" id="upload-tool-btn" onclick="uploadToolWithImage()">UPLOAD TOOL</button>
+            </div>
+        </div>
+
+        <div class="card" style="border: 1px solid gold; margin-top:20px;">
+             <div class="card-content">
+                <h3 style="color:gold;">👑 Upload Prime PDF/Video</h3>
+                <input type="text" id="prime-title" placeholder="Content Title">
                 
-                <div class="upload-box">
-                    <label style="color:white;">Select Image (Gallery)</label><br>
-                    <input type="file" id="tool-file-input" accept="image/*" style="display:block; margin-top:5px; color:white;">
+                <div class="upload-box" style="border-color:gold;">
+                    <label style="color:gold;">Select PDF or Video (Gallery)</label><br>
+                    <input type="file" id="prime-file-input" accept=".pdf, video/*" style="color:white;">
                 </div>
 
-                <textarea id="tool-desc" rows="3" placeholder="How to Install / Description..."></textarea>
-                <textarea id="tool-cmds" rows="4" placeholder="Commands (pkg install...)" style="font-family:monospace; color:#00ff41; background:#050505;"></textarea>
-                <input type="text" id="tool-video" placeholder="YouTube Video ID (Optional)">
+                <select id="prime-type" style="background:#111; color:white; margin:10px 0;">
+                    <option value="pdf">Document (PDF)</option>
+                    <option value="video">Video Class</option>
+                </select>
 
-                <button class="btn-main" id="upload-tool-btn" onclick="uploadToolWithImage()">💾 UPLOAD TOOL</button>
+                <button class="btn-gold" id="upload-prime-btn" onclick="uploadPrimeWithFile()">UPLOAD TO PRIME</button>
             </div>
         </div>
     </div>
-
-    <div id="live-section" class="hidden-section"><h2 style="text-align:center; color:red;">🔴 Live Classes</h2><div id="active-live-card" style="display:none;" class="card"><button class="btn-danger" onclick="joinLiveStream()">JOIN LIVE</button></div><div id="no-live-msg" style="text-align:center;">No Class Active.</div><div id="user-video-container" style="display:none;"><video id="remote-video" autoplay playsinline style="width:100%;"></video></div></div>
-    
-    <div id="prime-section" class="hidden-section"><h2 style="text-align:center; color:gold;">👑 Prime Zone</h2><div id="prime-grid"></div></div>
 
   </div>
 
   <div id="articleModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal()">&times;</span>
-        <h2 id="modal-title" style="color:#00ff41;">Tool Name</h2>
-        <img id="modal-img" src="" style="width:100%; height:200px; object-fit:cover; border-radius:5px;">
-        <div id="modal-desc" style="margin-top:10px; color:#ccc; font-size:14px;"></div>
-        <div id="modal-video-container" style="margin-top:10px;"><iframe id="modal-video" width="100%" height="200" frameborder="0"></iframe></div>
+        <h2 id="modal-title" style="color:#00ff41;">Tool</h2>
+        <img id="modal-img" src="" style="width:100%; height:200px; object-fit:cover;">
+        <div id="modal-desc" style="margin-top:10px; color:#ccc;"></div>
+        <iframe id="modal-video" width="100%" height="200" frameborder="0" style="margin-top:10px;"></iframe>
     </div>
   </div>
 
