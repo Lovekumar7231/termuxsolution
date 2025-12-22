@@ -221,3 +221,33 @@ function listenForLiveStatus() {
 
 // ... (Baaki Live Stream Functions tumhare purane wale use honge)
 
+/* --- LOGIN CHECK & ADMIN PANEL VISIBILITY --- */
+function checkLogin() {
+    const name = localStorage.getItem("agentName");
+    // "isAdmin" को string की तरह चेक करें
+    const isAdminUser = localStorage.getItem("isAdmin") === "true"; 
+
+    if(name) {
+        currentUser = name;
+        currentUserKey = name.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        isAdmin = isAdminUser;
+        
+        // Login/Logout links toggle
+        document.getElementById('loggedOutLinks').style.display = 'none';
+        document.getElementById('loggedInLinks').style.display = 'block';
+
+        // अगर ADMIN है, तो Sidebar में Panel दिखाओ
+        if(isAdmin) {
+            const adminLink = document.getElementById('admin-link');
+            if(adminLink) {
+                adminLink.style.display = 'block';
+            }
+            // Admin Section (Main Page) भी visible कर सकते हो अगर चाहो
+            // लेकिन sidebar लिंक बेहतर है
+        }
+    } else {
+        // अगर लॉगिन नहीं है
+        document.getElementById('loggedOutLinks').style.display = 'block';
+        document.getElementById('loggedInLinks').style.display = 'none';
+    }
+}
