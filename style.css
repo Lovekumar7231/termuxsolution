@@ -1,7 +1,8 @@
+/* Hacker Theme Setup */
 :root {
-    --main: #00ff41;
-    --bg: #050505;
-    --card-bg: #111;
+    --main: #00ff41;    /* Hacker Green */
+    --bg: #0d0d0d;      /* Dark Black */
+    --card-bg: #1a1a1a;
     --danger: #ff0055;
     --gold: #ffd700;
 }
@@ -12,10 +13,10 @@ body {
     font-family: 'Courier New', monospace;
     background-color: var(--bg);
     color: var(--main);
-    padding-bottom: 60px;
+    padding-bottom: 80px;
 }
 
-/* --- HEADER & NAV --- */
+/* --- HEADER STYLING --- */
 header {
     display: flex;
     justify-content: space-between;
@@ -26,20 +27,48 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 255, 65, 0.1);
 }
 
-.logo-area { display: flex; align-items: center; gap: 10px; }
+.menu-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--main);
+}
 
-/* 🔥 FIX: PROFILE IMAGE SIZE */
-.profile-icon-header {
+/* GLOWING LOGO EFFECT */
+.brand-glow {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    color: white;
+    line-height: 1.2;
+    /* Neon Animation */
+    animation: neonGlow 2s infinite alternate;
+}
+
+@keyframes neonGlow {
+    0% { text-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de; }
+    50% { text-shadow: 0 0 5px #00e5ff, 0 0 10px #00e5ff; }
+    100% { text-shadow: 0 0 5px #00ff41, 0 0 10px #00ff41; }
+}
+
+/* PROFILE ICON (Right Side) */
+.profile-icon-right {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     border: 2px solid var(--main);
+    overflow: hidden;
+    background: #222;
+    cursor: pointer;
+}
+.profile-icon-right img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
 }
-
-.menu-icon { font-size: 24px; cursor: pointer; }
 
 /* --- SIDEBAR --- */
 .sidebar {
@@ -48,48 +77,48 @@ header {
     position: fixed;
     z-index: 1000;
     top: 0;
-    right: 0;
+    left: 0;
     background-color: #000;
     overflow-x: hidden;
     transition: 0.3s;
+    border-right: 1px solid var(--main);
     padding-top: 60px;
-    border-left: 1px solid var(--main);
 }
 .sidebar a {
-    padding: 10px 25px;
+    padding: 15px 25px;
     text-decoration: none;
     font-size: 18px;
     color: #ccc;
     display: block;
     border-bottom: 1px solid #222;
+    transition: 0.2s;
     cursor: pointer;
 }
-.sidebar a:hover { color: var(--main); }
+.sidebar a:hover {
+    color: var(--main);
+    background: rgba(0, 255, 65, 0.1);
+}
 .closebtn {
-    position: absolute; top: 0; right: 25px; font-size: 36px; margin-left: 50px; color: var(--danger);
+    position: absolute;
+    top: 0;
+    right: 20px;
+    font-size: 36px;
+    color: var(--danger);
 }
 
-/* --- CARDS & LAYOUT --- */
+/* --- CARDS & BUTTONS --- */
 .container { padding: 15px; max-width: 800px; margin: auto; }
 .hidden-section { display: none; }
 
 .card {
     background: var(--card-bg);
     border: 1px solid #333;
-    border-radius: 5px;
+    border-radius: 8px;
     margin-bottom: 15px;
-    overflow: hidden;
+    padding: 15px;
 }
-.card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-bottom: 1px solid #333;
-}
-.card-content { padding: 15px; }
 
-/* --- INPUTS & BUTTONS --- */
-input, textarea {
+input, select {
     width: 100%;
     padding: 12px;
     margin: 10px 0;
@@ -97,7 +126,9 @@ input, textarea {
     border: 1px solid #333;
     color: white;
     box-sizing: border-box;
+    border-radius: 5px;
 }
+
 button {
     width: 100%;
     padding: 12px;
@@ -105,42 +136,34 @@ button {
     font-weight: bold;
     border: none;
     margin-top: 5px;
+    border-radius: 5px;
 }
+
 .btn-main { background: var(--main); color: black; }
 .btn-danger { background: var(--danger); color: white; }
 .btn-gold { background: var(--gold); color: black; }
 
-/* --- MODAL (POPUP) --- */
-.modal {
-    display: none; position: fixed; z-index: 2000; left: 0; top: 0;
-    width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); overflow-y: auto;
-}
-.modal-content {
-    background: #0d1117; margin: 10% auto; padding: 20px;
-    border: 1px solid var(--main); width: 90%; max-width: 600px;
-    border-radius: 8px; position: relative;
-}
-.close-modal {
-    color: var(--danger); float: right; font-size: 28px;
-    font-weight: bold; cursor: pointer;
-}
-
-/* --- LIVE BANNER --- */
-.live-banner {
-    display: none;
-    background: linear-gradient(45deg, #f09433, #dc2743);
-    padding: 10px; color: white;
-    justify-content: space-between; align-items: center;
-    margin-bottom: 10px; border-radius: 5px;
-}
-
-/* --- AUTH BOX --- */
-.auth-box {
-    border: 1px solid var(--main);
+/* --- UPLOAD UI (Gallery Button) --- */
+.upload-box {
+    border: 2px dashed #333;
     padding: 20px;
+    margin: 10px 0;
     text-align: center;
-    max-width: 350px;
-    margin: 50px auto;
-    background: #0d1117;
+    border-radius: 10px;
+    background: rgba(0, 255, 65, 0.02);
+}
+.file-btn-label {
+    background: linear-gradient(45deg, #ff00de, #00e5ff);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+}
+input[type="file"] {
+    display: none; /* Hide default ugly input */
 }
 
