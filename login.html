@@ -7,6 +7,27 @@
     <link rel="stylesheet" href="auth-style.css"> 
     
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
+            authDomain: "termuxhacking-aac55.firebaseapp.com",
+            projectId: "termuxhacking-aac55",
+            storageBucket: "termuxhacking-aac55.firebasestorage.app",
+            messagingSenderId: "921781091312",
+            appId: "1:921781091312:web:39a1b96ceda5bc60b83b35"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        window.dbRef = ref(db);
+        window.dbGet = get;
+        window.dbChild = child;
+    </script>
+
     <script type="text/javascript">
        (function(){ emailjs.init("ijs5TFBMM18XzlFac"); })();
     </script>
@@ -14,7 +35,7 @@
 <body>
 
 <div class="auth-box">
-    <h2 class="glitch" id="loginTitle">SYSTEM LOGIN</h2>
+    <h2 class="glitch">SYSTEM LOGIN</h2>
 
     <div id="login-form">
         <div class="input-group">
@@ -28,88 +49,106 @@
         </div>
 
         <div style="border:1px dashed #00ff41; padding:10px; margin-bottom: 20px;">
-            <label style="color:gold; font-size: 12px; font-weight: bold;">SECURITY CHECK</label>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+            <label style="color:gold; font-size: 11px;">SECURITY CHECK</label>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span id="captcha-question" style="color:#ffd700; font-size:18px; font-weight:bold;"></span>
-                <input type="number" id="captcha-input" placeholder="?" style="width:60px; text-align:center; height: 35px;">
+                <input type="number" id="captcha-input" placeholder="?" style="width:50px; text-align:center;">
             </div>
         </div>
 
         <button id="loginBtn" onclick="handleLogin()">EXECUTE LOGIN</button>
         
-        <div class="link-container" style="margin-top:20px; text-align:center; display:flex; flex-direction:column; gap:10px;">
-            <a href="signup.html" style="color:#00ff41; text-decoration:none; font-size:13px;">Create New Account</a>
-            <a href="forgot_password.html" style="color:#ff512f; text-decoration:none; font-size:13px; font-weight:bold;">Forgot Password?</a>
+        <div class="link-container" style="margin-top:15px; text-align:center; display:flex; flex-direction:column; gap:8px;">
+            <a href="signup.html" style="color:#00ff41; text-decoration:none; font-size:12px;">Create New Account</a>
+            <a href="forgot_password.html" style="color:#ff512f; text-decoration:none; font-size:12px;">Forgot Password?</a>
         </div>
     </div>
 
     <div id="otp-form" style="display:none;">
-        <p style="color:red; font-weight:bold; text-align:center;">⚠️ ADMIN DETECTED</p>
+        <p style="color:red; font-weight:bold; text-align:center;">⚠️ VERIFICATION REQUIRED</p>
         <div class="input-group">
             <label>ENTER OTP CODE</label>
             <input type="number" id="adminOtp" placeholder="XXXX">
         </div>
-        <button onclick="verifyAdminOtp()">UNLOCK SYSTEM</button>
+        <button onclick="verifyOtp()">UNLOCK SYSTEM</button>
     </div>
 </div>
 
 <script>
-    // Captcha Logic
     let n1 = Math.floor(Math.random() * 10);
     let n2 = Math.floor(Math.random() * 10);
     document.getElementById('captcha-question').innerText = `${n1} + ${n2} = ?`;
 
     let generatedOtp = 0;
 
-    function handleLogin() {
+    async function handleLogin() {
         const user = document.getElementById('loginUser').value.trim();
         const pass = document.getElementById('loginPass').value.trim();
         const captcha = document.getElementById('captcha-input').value;
+        const btn = document.getElementById('loginBtn');
 
         if(parseInt(captcha) !== (n1 + n2)) {
             alert("❌ Captcha Wrong!");
             return;
         }
 
-        // Admin Special Check
+        // 1. Admin Logic
         if (user === "Admin" && pass === "Love@728296#$") {
-            sendAdminOTP();
+            sendEmailOTP("termuxhacking72@gmail.com", "Commander Admin");
             return;
         }
 
-        // Normal Login Simulation
-        if(user && pass) {
-            localStorage.setItem("agentName", user);
-            alert("✅ Welcome Agent " + user);
-            window.location.href = "index.html";
-        } else {
-            alert("⚠️ Please fill all fields!");
+        // 2. Database User Login Logic
+        btn.innerText = "AUTHENTICATING...";
+        btn.disabled = true;
+
+        try {
+            const snapshot = await window.dbGet(window.dbChild(window.dbRef, `users/${user}`));
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                if (userData.password === pass) {
+                    // पासवर्ड सही होने पर OTP भेजना
+                    sendEmailOTP(userData.email, user);
+                } else {
+                    alert("❌ Incorrect Password!");
+                    btn.innerText = "EXECUTE LOGIN";
+                    btn.disabled = false;
+                }
+            } else {
+                alert("❌ Agent Not Found!");
+                btn.innerText = "EXECUTE LOGIN";
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert("Error: " + e);
+            btn.innerText = "EXECUTE LOGIN";
+            btn.disabled = false;
         }
     }
 
-    function sendAdminOTP() {
+    function sendEmailOTP(email, name) {
         generatedOtp = Math.floor(1000 + Math.random() * 9000);
-        const params = {
-            to_email: "termuxhacking72@gmail.com",
-            otp_code: generatedOtp
-        };
+        const params = { to_email: email, otp_code: generatedOtp, name: name };
 
         emailjs.send("service_idclxul", "template_6sk2up1", params)
             .then(() => {
-                alert("✅ Admin OTP Sent!");
+                alert("✅ OTP sent to " + email);
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('otp-form').style.display = 'block';
             });
     }
 
-    function verifyAdminOtp() {
-        if(document.getElementById('adminOtp').value == generatedOtp) {
+    function verifyOtp() {
+        const entered = document.getElementById('adminOtp').value;
+        if(entered == generatedOtp && generatedOtp !== 0) {
+            alert("🔓 Access Granted!");
             window.location.href = "index.html";
         } else {
-            alert("❌ Denied!");
+            alert("❌ Wrong OTP!");
         }
     }
 </script>
 
 </body>
 </html>
+
