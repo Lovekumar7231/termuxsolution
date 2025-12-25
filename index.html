@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style>
-        /* GLOW EFFECTS FOR SEARCH & ADMIN */
+        /* --- NEW EFFECTS (ONLY FOR ADMIN & SEARCH) --- */
         #search-input { transition: 0.3s; border: 1px solid #333; }
         #search-input:focus { 
             border: 1px solid #00ff41 !important; 
@@ -16,22 +16,24 @@
             outline: none; 
         }
 
-        .admin-card-green { border: 1px solid #00ff41 !important; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
-        .admin-card-red { border: 1px solid #ff0055 !important; box-shadow: 0 0 10px rgba(255, 0, 85, 0.2); }
+        .admin-glow-green { border: 1px solid #00ff41 !important; box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); }
+        .admin-glow-red { border: 1px solid #ff0055 !important; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); }
 
-        .btn-upload-green {
-            background: transparent; border: 1px solid #00ff41; color: #00ff41;
-            padding: 10px; width: 100%; cursor: pointer; transition: 0.4s; font-weight: bold;
+        .btn-green-glow {
+            background: #111; border: 1px solid #00ff41; color: #00ff41;
+            padding: 10px; cursor: pointer; transition: 0.4s; font-weight: bold; width: 100%;
         }
-        .btn-upload-green:hover { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
+        .btn-green-glow:hover { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
 
-        .btn-upload-red {
-            background: transparent; border: 1px solid #ff0055; color: #ff0055;
-            padding: 10px; width: 100%; cursor: pointer; transition: 0.4s; font-weight: bold;
+        .btn-red-glow {
+            background: #111; border: 1px solid #ff0055; color: #ff0055;
+            padding: 10px; cursor: pointer; transition: 0.4s; font-weight: bold; width: 100%;
         }
-        .btn-upload-red:hover { background: #ff0055; color: #fff; box-shadow: 0 0 20px #ff0055; }
+        .btn-red-glow:hover { background: #ff0055; color: #fff; box-shadow: 0 0 20px #ff0055; }
 
-        .upload-box { border: 1px dashed #444; padding: 15px; text-align: center; margin: 10px 0; border-radius: 8px; }
+        .profile-upload-btn {
+            background: #222; color: #00ff41; border: 1px solid #444; padding: 5px; border-radius: 5px; cursor: pointer;
+        }
     </style>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -41,7 +43,6 @@
         import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // CONFIG
         window.dbConfig = {
             apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
             authDomain: "termuxhacking-aac55.firebaseapp.com",
@@ -59,8 +60,8 @@
         window.BOT_TOKEN = "8004087165:AAF-fMbvjDYSK64m0maGNf6oIUOvq9Xr-8w";
         window.CHAT_ID = "-1001003225658257";
 
-        // EXPORT REFS
-        window.dbRef = ref; window.dbSet = set; window.dbPush = push; window.dbOnValue = onValue;
+        window.dbRef = ref; window.dbSet = set; window.dbGet = get; window.dbPush = push; window.dbOnValue = onValue; window.dbUpdate = update;
+        window.sRef = sRef; window.uploadBytes = uploadBytes; window.getDownloadURL = getDownloadURL;
     </script>
 </head>
 <body onload="initApp()">
@@ -109,72 +110,90 @@
         </div>
     </div>
 
-    <div id="prime-section" class="hidden-section">
-        <h2 style="color:gold; text-align:center;">👑 PRIME MEMBERSHIP</h2>
-        <div id="prime-grid"></div>
-    </div>
-
     <div id="admin-section" class="hidden-section">
-        <h2 style="color:red; text-align:center;">⚠️ ADMIN PANEL</h2>
+        <h2 style="color:red; text-align:center;">⚠️ MASTER ADMIN</h2>
 
-        <div class="card admin-card-green">
-            <h3 style="color:#00ff41;">🛠 Upload Tool (Image)</h3>
+        <div class="card admin-glow-green">
+            <h3 style="color:#00ff41;">🛠 Upload Tool (to Telegram)</h3>
             <input type="text" id="tool-name" placeholder="Tool Name">
-            <div class="upload-box"><input type="file" id="tool-file-input" accept="image/*"></div>
+            <div class="upload-box">
+                <label>Select Photo</label><br>
+                <input type="file" id="tool-file-input" accept="image/*" style="color:white;">
+            </div>
             <textarea id="tool-desc" rows="3" placeholder="Description..."></textarea>
-            <button class="btn-upload-green" onclick="handleUpload('tool')">UPLOAD TO TELEGRAM</button>
+            <button class="btn-green-glow" onclick="uploadToolWithTelegram()">🚀 UPLOAD TO TELEGRAM</button>
         </div>
 
-        <div class="card admin-card-red" style="margin-top:20px;">
-            <h3 style="color:#ff0055;">👑 Upload Prime Content (PDF/Video)</h3>
+        <div class="card admin-glow-red" style="margin-top:20px;">
+            <h3 style="color:#ff0055;">👑 Upload Prime PDF/Video</h3>
             <input type="text" id="prime-title" placeholder="Content Title">
-            <div class="upload-box"><input type="file" id="prime-file-input" accept=".pdf, video/*"></div>
-            <select id="prime-type" style="background:#111; color:white; margin:10px 0; width:100%; padding:10px;">
+            <div class="upload-box" style="border-color:#ff0055;">
+                <label>Select PDF or Video</label><br>
+                <input type="file" id="prime-file-input" accept=".pdf, video/*" style="color:white;">
+            </div>
+            <select id="prime-type" style="background:#111; color:white; width:100%; padding:10px; margin:10px 0;">
                 <option value="pdf">PDF Document</option>
                 <option value="video">Video Class</option>
             </select>
-            <button class="btn-upload-red" onclick="handleUpload('prime')">UPLOAD TO PRIME</button>
+            <button class="btn-red-glow" onclick="uploadPrimeWithTelegram()">📤 SEND TO PRIME ZONE</button>
         </div>
     </div>
+
+    <div id="profile-section" class="hidden-section">
+        <h2 style="color:#00ff41; text-align:center;">👤 USER PROFILE</h2>
+        <div class="card" style="text-align:center; border: 1px solid #333;">
+             <div style="position: relative; display: inline-block;">
+                <img id="profile-preview-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:120px; height:120px; border-radius:50%; border:3px solid #00ff41; object-fit: cover;">
+                <label for="profile-file-input" style="position: absolute; bottom: 5px; right: 5px; background: #111; padding: 5px; border-radius: 50%; cursor: pointer; border: 1px solid #00ff41;">
+                    <i class="fas fa-camera" style="color:#00ff41;"></i>
+                </label>
+             </div>
+             <input type="file" id="profile-file-input" accept="image/*" style="display:none;" onchange="previewFile('profile-file-input', 'profile-preview-img')">
+             
+             <div style="margin-top:20px; text-align:left;">
+                <label style="color:#666; font-size:12px;">Full Name</label>
+                <input type="text" id="profile-name" placeholder="Enter Name" style="width:100%; margin-bottom:10px;">
+                
+                <label style="color:#666; font-size:12px;">Gmail Address</label>
+                <input type="email" id="profile-email" placeholder="example@gmail.com" style="width:100%; margin-bottom:10px; background:#111; color:#fff; border:1px solid #333; padding:10px; border-radius:5px;">
+                
+                <label style="color:#666; font-size:12px;">Date of Birth</label>
+                <input type="date" id="profile-dob" style="width:100%; background:#111; color:#fff; border:1px solid #333; padding:10px; border-radius:5px;">
+             </div>
+             <button class="btn-green-glow" style="margin-top:20px;" onclick="saveUserProfileWithFile()">SAVE CHANGES</button>
+        </div>
+    </div>
+
   </div>
 
   <script>
-    async function handleUpload(type) {
-        const fileInput = type === 'tool' ? document.getElementById('tool-file-input') : document.getElementById('prime-file-input');
-        const title = type === 'tool' ? document.getElementById('tool-name').value : document.getElementById('prime-title').value;
-        const file = fileInput.files[0];
-
-        if(!file || !title) return alert("Please fill all details and select a file!");
-
+    async function uploadToTelegram(file, caption) {
         const formData = new FormData();
         formData.append('chat_id', window.CHAT_ID);
         formData.append('document', file);
-        formData.append('caption', `New Upload: ${title}\nType: ${type}`);
+        formData.append('caption', caption);
+        const res = await fetch(`https://api.telegram.org/bot${window.BOT_TOKEN}/sendDocument`, { method: 'POST', body: formData });
+        return res.json();
+    }
 
-        alert("Uploading to Telegram... please wait.");
+    async function uploadToolWithTelegram() {
+        const file = document.getElementById('tool-file-input').files[0];
+        const name = document.getElementById('tool-name').value;
+        if(!file || !name) return alert("Fill all details!");
+        alert("Uploading Tool to Telegram...");
+        const result = await uploadToTelegram(file, `New Tool: ${name}`);
+        if(result.ok) alert("Tool Live on Telegram!");
+    }
 
-        try {
-            const response = await fetch(`https://api.telegram.org/bot${window.BOT_TOKEN}/sendDocument`, {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-
-            if(result.ok) {
-                const fileId = result.result.document ? result.result.document.file_id : result.result.video.file_id;
-                alert("Success! File ID generated. Now saving to Firebase...");
-                
-                // Firebase logic yahan aayega (aapke script.js ke mutabiq)
-                console.log("File ID:", fileId);
-            } else {
-                alert("Telegram Error: " + result.description);
-            }
-        } catch (e) {
-            alert("Upload failed. Check internet.");
-        }
+    async function uploadPrimeWithTelegram() {
+        const file = document.getElementById('prime-file-input').files[0];
+        const title = document.getElementById('prime-title').value;
+        if(!file || !title) return alert("Select File & Title!");
+        alert("Sending Prime Content...");
+        const result = await uploadToTelegram(file, `Prime Content: ${title}`);
+        if(result.ok) alert("Prime Content Uploaded!");
     }
   </script>
   <script src="script.js"></script>
 </body>
 </html>
-
