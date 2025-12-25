@@ -80,9 +80,10 @@
     document.getElementById('captcha-question').innerText = `${n1} + ${n2} = ?`;
 
     let generatedOtp = 0;
+    let isAdminLogin = false;
 
     async function handleLogin() {
-        const user = document.getElementById('loginUser').value.trim();
+        const userInput = document.getElementById('loginUser').value.trim();
         const pass = document.getElementById('loginPass').value.trim();
         const captcha = document.getElementById('captcha-input').value;
         const btn = document.getElementById('loginBtn');
@@ -92,38 +93,41 @@
             return;
         }
 
-        // 1. Admin Logic
-        if (user === "Admin" && pass === "Love@728296#$") {
+        // Admin Check (Case-Insensitive)
+        if (userInput.toLowerCase() === "admin" && pass === "Love@728296#$") {
+            isAdminLogin = true;
             sendEmailOTP("termuxhacking72@gmail.com", "Commander Admin");
             return;
         }
 
-        // 2. Database User Login Logic
+        // Database User Login
         btn.innerText = "AUTHENTICATING...";
         btn.disabled = true;
 
         try {
-            const snapshot = await window.dbGet(window.dbChild(window.dbRef, `users/${user}`));
+            const snapshot = await window.dbGet(window.dbChild(window.dbRef, `users/${userInput}`));
             if (snapshot.exists()) {
                 const userData = snapshot.val();
                 if (userData.password === pass) {
-                    // पासवर्ड सही होने पर OTP भेजना
-                    sendEmailOTP(userData.email, user);
+                    isAdminLogin = false;
+                    sendEmailOTP(userData.email, userInput);
                 } else {
                     alert("❌ Incorrect Password!");
-                    btn.innerText = "EXECUTE LOGIN";
-                    btn.disabled = false;
+                    resetBtn(btn);
                 }
             } else {
                 alert("❌ Agent Not Found!");
-                btn.innerText = "EXECUTE LOGIN";
-                btn.disabled = false;
+                resetBtn(btn);
             }
         } catch (e) {
             alert("Error: " + e);
-            btn.innerText = "EXECUTE LOGIN";
-            btn.disabled = false;
+            resetBtn(btn);
         }
+    }
+
+    function resetBtn(btn) {
+        btn.innerText = "EXECUTE LOGIN";
+        btn.disabled = false;
     }
 
     function sendEmailOTP(email, name) {
@@ -132,15 +136,20 @@
 
         emailjs.send("service_idclxul", "template_6sk2up1", params)
             .then(() => {
-                alert("✅ OTP sent to " + email);
+                alert("✅ Verification OTP sent to " + email);
                 document.getElementById('login-form').style.display = 'none';
                 document.getElementById('otp-form').style.display = 'block';
+            }, (err) => {
+                alert("EmailJS Error: " + JSON.stringify(err));
+                location.reload();
             });
     }
 
     function verifyOtp() {
         const entered = document.getElementById('adminOtp').value;
         if(entered == generatedOtp && generatedOtp !== 0) {
+            localStorage.setItem("isAdmin", isAdminLogin ? "true" : "false");
+            localStorage.setItem("agentName", isAdminLogin ? "Admin" : document.getElementById('loginUser').value);
             alert("🔓 Access Granted!");
             window.location.href = "index.html";
         } else {
