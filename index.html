@@ -57,62 +57,86 @@
   </div>
 
   <div class="container">
+
     <div id="home-section" class="hidden-section" style="display:block;">
-        <div style="margin-bottom: 20px; position:relative;">
-            <input type="text" id="search-input" placeholder="🔍 Search Tool..." 
-                style="padding: 12px 15px; border-radius: 25px; border: 1px solid #00ff41; background: #111; color: white; width: 100%; outline:none;">
-        </div>
+        <input type="text" id="search-input" onkeyup="searchTools()" placeholder="🔍 Search Tool...">
         <h3>🔥 Latest Tools</h3>
         <div id="tools-grid"></div>
     </div>
 
+    <div id="about-section" class="hidden-section">
+        <h2 style="color:#00ff41; text-align:center;">ℹ️ ABOUT US</h2>
+        <div class="card" style="text-align:center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/2092/2092663.png" style="width:80px;">
+            <h3>Termux Hacking Family</h3>
+            <div id="wa-locked" class="wa-box">
+                <p style="color:red;">🔒 WhatsApp (Prime Only)</p>
+                <button class="btn-gold" onclick="showSection('prime')">UNLOCK NOW</button>
+            </div>
+            <div id="wa-unlocked" style="display:none;" class="wa-box">
+                <p style="color:#00ff41;">✅ +91 72318 60034</p>
+                <a href="https://wa.me/917231860034" class="btn-main" style="background:#25D366;">CHAT NOW</a>
+            </div>
+            <div class="social-links">
+                <a href="https://t.me/Termuxcommandsi" class="social-btn tg"><i class="fab fa-telegram"></i> Telegram</a>
+                <a href="https://youtube.com/@termuxhacking0" class="social-btn yt"><i class="fab fa-youtube"></i> YouTube</a>
+            </div>
+        </div>
+    </div>
+
     <div id="profile-section" class="hidden-section">
-        <h2 style="color:#00ff41; text-align:center;">👤 MY PROFILE</h2>
+        <h2 style="color:#00ff41; text-align:center;">👤 PROFILE</h2>
         <div class="card" style="text-align:center;">
              <img id="profile-preview-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:100px; height:100px; border-radius:50%; border:2px solid #00ff41; object-fit:cover;">
              <br>
-             <label for="profile-file-input" class="file-btn-label" style="margin-top:10px; display:inline-block;">CHANGE PHOTO</label>
+             <label for="profile-file-input" class="file-btn-label">CHANGE PHOTO</label>
              <input type="file" id="profile-file-input" accept="image/*" onchange="previewFile('profile-file-input', 'profile-preview-img')">
              
-             <input type="text" id="profile-name" readonly style="background:#222; color:#888;" placeholder="Username">
+             <p style="color:#666; margin-bottom:5px;">Username</p>
+             <input type="text" id="profile-name" readonly style="background:#222;">
+             <p style="color:#666; margin-bottom:5px;">Date of Birth</p>
              <input type="date" id="profile-dob">
-             <button class="btn-main" id="save-profile-btn" onclick="saveUserProfileWithFile()">SAVE PROFILE</button>
+             <button class="btn-main" id="save-profile-btn" onclick="saveUserProfileWithFile()">SAVE DATA</button>
         </div>
+    </div>
+
+    <div id="prime-section" class="hidden-section">
+        <h2 style="color:gold; text-align:center;">👑 PRIME ZONE</h2>
+        <div id="buy-btn-container" class="card" style="border:1px solid gold; text-align:center;">
+            <h3>Premium Plan</h3>
+            <p>Unlock All Tools & Support</p>
+            <h2 style="color:gold;">₹399 / Lifetime</h2>
+            <button class="btn-gold" onclick="startRazorpayPayment()">BUY NOW</button>
+        </div>
+        <div id="already-prime" style="display:none;" class="card">
+            <p style="color:#00ff41; text-align:center; font-weight:bold;">✅ PRIME ACTIVE</p>
+        </div>
+        <h3 style="color:gold;">🔓 Premium Content</h3>
+        <div id="prime-grid"></div>
     </div>
 
     <div id="admin-section" class="hidden-section">
         <h2 style="color:red; text-align:center;">⚠️ ADMIN PANEL</h2>
-        <div class="card" style="border: 1px solid #00ff41;">
-            <div class="card-content">
-                <h3 style="color:#00ff41;">🛠 Upload Tool</h3>
-                <input type="text" id="tool-name" placeholder="Tool Name">
-                <div class="upload-box">
-                    <label>Select Image</label><br>
-                    <input type="file" id="tool-file-input" accept="image/*" style="display:block; color:white; margin-top:10px;">
-                </div>
-                <textarea id="tool-desc" rows="3" placeholder="Description..."></textarea>
-                <textarea id="tool-cmds" rows="4" placeholder="Commands..."></textarea>
-                <button class="btn-main" id="upload-tool-btn" onclick="uploadToolWithImage()">UPLOAD TOOL</button>
-            </div>
+        <div class="card">
+            <h3>🛠 Upload Tool</h3>
+            <input type="text" id="tool-name" placeholder="Tool Name">
+            <input type="file" id="tool-file-input" accept="image/*" style="display:block; margin:10px 0;">
+            <textarea id="tool-cmds" placeholder="Commands..."></textarea>
+            <button class="btn-main" onclick="uploadToolWithImage()">UPLOAD</button>
         </div>
+        <div class="card" style="border-color:gold;">
+            <h3>👑 Upload Prime (PDF/Video)</h3>
+            <input type="text" id="prime-title" placeholder="Title">
+            <input type="file" id="prime-file-input" accept="application/pdf, video/*" style="display:block; margin:10px 0;">
+            <select id="prime-type">
+                <option value="pdf">PDF</option>
+                <option value="video">Video</option>
+            </select>
+            <button class="btn-gold" onclick="uploadPrimeWithFile()">UPLOAD TO PRIME</button>
+        </div>
+    </div>
 
-        <div class="card" style="border: 1px solid gold; margin-top:20px;">
-             <div class="card-content">
-                <h3 style="color:gold;">👑 Upload Prime Content</h3>
-                <input type="text" id="prime-title" placeholder="Content Title">
-                <div class="upload-box" style="border-color:gold;">
-                    <label style="color:gold;">Select PDF/Video</label><br>
-                    <input type="file" id="prime-file-input" accept="application/pdf, video/*" style="display:block; color:white; margin-top:10px;">
-                </div>
-                <select id="prime-type" style="background:#111; color:white; margin:10px 0;">
-                    <option value="pdf">PDF Document</option>
-                    <option value="video">Video Class</option>
-                </select>
-                <button class="btn-gold" id="upload-prime-btn" onclick="uploadPrimeWithFile()">UPLOAD TO PRIME</button>
-            </div>
-        </div>
-    </div>
-    </div>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
