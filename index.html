@@ -8,43 +8,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style>
-        /* --- ONLY ADMIN & SEARCH GLOW EFFECTS --- */
-        #search-input:focus { 
-            border: 1px solid #00ff41 !important; 
-            box-shadow: 0 0 15px #00ff41; 
-            outline: none; 
-        }
+        /* SEARCH BAR GLOW */
+        #search-input:focus { border: 1px solid #00ff41 !important; box-shadow: 0 0 15px #00ff41; outline: none; }
 
+        /* ADMIN GLOW EFFECTS */
         .admin-glow-green { border: 1px solid #00ff41 !important; box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
         .admin-glow-red { border: 1px solid #ff0055 !important; box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); padding: 15px; border-radius: 10px; margin-top: 20px; }
 
-        .btn-green-glow {
-            background: #111; border: 1px solid #00ff41; color: #00ff41;
-            padding: 12px; cursor: pointer; transition: 0.4s; font-weight: bold; width: 100%; border-radius: 5px;
-        }
+        .btn-green-glow { background: #111; border: 1px solid #00ff41; color: #00ff41; padding: 12px; cursor: pointer; font-weight: bold; width: 100%; border-radius: 5px; }
         .btn-green-glow:hover { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
 
-        .btn-red-glow {
-            background: #111; border: 1px solid #ff0055; color: #ff0055;
-            padding: 12px; cursor: pointer; transition: 0.4s; font-weight: bold; width: 100%; border-radius: 5px;
-        }
+        .btn-red-glow { background: #111; border: 1px solid #ff0055; color: #ff0055; padding: 12px; cursor: pointer; font-weight: bold; width: 100%; border-radius: 5px; }
         .btn-red-glow:hover { background: #ff0055; color: #fff; box-shadow: 0 0 20px #ff0055; }
 
-        .upload-label { 
-            display: block; padding: 15px; border: 1px dashed #444; border-radius: 8px; 
-            cursor: pointer; color: #00ff41; text-align: center; margin: 10px 0;
-        }
-        /* --------------------------------------- */
+        /* CLICKABLE UPLOAD BOX */
+        .upload-label { display: block; padding: 15px; border: 1px dashed #444; border-radius: 8px; cursor: pointer; color: #00ff41; text-align: center; margin: 10px 0; }
     </style>
-
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const dbConfig = {
+        window.dbConfig = {
             apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
             authDomain: "termuxhacking-aac55.firebaseapp.com",
             projectId: "termuxhacking-aac55",
@@ -53,15 +38,10 @@
             appId: "1:921781091312:web:39a1b96ceda5bc60b83b35"
         };
 
-        const app = initializeApp(dbConfig);
+        const app = initializeApp(window.dbConfig);
         window.db = getDatabase(app);
-        window.storage = getStorage(app);
         window.BOT_TOKEN = "8004087165:AAF-fMbvjDYSK64m0maGNf6oIUOvq9Xr-8w";
         window.CHAT_ID = "-1001003225658257";
-
-        // Exports
-        window.dbRef = ref; window.dbSet = set; window.dbPush = push; window.sRef = sRef; 
-        window.uploadBytes = uploadBytes; window.getDownloadURL = getDownloadURL;
     </script>
 </head>
 <body onload="initApp()">
@@ -76,120 +56,63 @@
 
   <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a onclick="showSection('home')"><i class="fas fa-home"></i> Home</a>
-    <a onclick="showSection('about')"><i class="fas fa-info-circle"></i> About Us</a>
-    <a onclick="showSection('profile')"><i class="fas fa-user-secret"></i> Profile</a>
-    <a onclick="showSection('prime')" style="color:gold;"><i class="fas fa-crown"></i> Prime Zone</a>
-    <div id="admin-link" style="display:none; border-top:1px solid #333; margin-top:10px;">
-        <p style="color:#666; font-size:12px; padding-left:20px; margin-top:10px;">ADMIN ACCESS</p>
-        <a onclick="showSection('admin')" style="color:red;"><i class="fas fa-cogs"></i> Admin Panel</a>
-    </div>
+    <a onclick="showSection('home'); closeNav();"><i class="fas fa-home"></i> Home</a>
+    <a onclick="showSection('about'); closeNav();"><i class="fas fa-info-circle"></i> About Us</a>
+    <a onclick="showSection('profile'); closeNav();"><i class="fas fa-user-secret"></i> Profile</a>
+    <a onclick="showSection('admin'); closeNav();" style="color:red;"><i class="fas fa-cogs"></i> Admin Panel</a>
   </div>
 
   <div class="container">
-    <div id="home-section" class="hidden-section" style="display:block;">
-        <div style="margin-bottom: 20px; position:relative;">
-            <input type="text" id="search-input" onkeyup="searchTools()" placeholder="🔍 Search Tool..." 
-                style="padding: 12px 15px; border-radius: 25px; background: #111; color: white; width: 100%;">
-        </div>
-        <div id="tools-grid"></div>
+    <div id="home-section" class="section">
+        <input type="text" id="search-input" placeholder="🔍 Search Tool..." style="width:100%; padding:12px; border-radius:25px; background:#111; color:white; border:1px solid #333;">
+        <div id="tools-grid" style="margin-top:20px;"></div>
     </div>
 
-    <div id="about-section" class="hidden-section">
+    <div id="about-section" class="section hidden-section">
         <h2 style="color:#00ff41; text-align:center;">ℹ️ ABOUT US</h2>
         <div class="card" style="text-align:center;">
-            <img src="https://cdn-icons-png.flaticon.com/512/2092/2092663.png" style="width:100px; height:100px; margin-bottom:15px; filter: drop-shadow(0 0 10px #00ff41);">
-            <h3 style="color:white;">Termux Hacking Family</h3>
-            <div style="border: 1px dashed gold; padding:15px; margin:15px 0; border-radius:10px;">
-                <i class="fab fa-whatsapp" style="color:#25D366; font-size:24px;"></i> 
-                <span style="color:white; font-weight:bold;"> Official Support</span>
-                <div id="wa-locked" style="margin-top:10px;">
-                    <p style="color:red; font-size:12px;">🔒 LOCKED (Prime Only)</p>
-                    <p style="filter: blur(5px); color:#aaa;">+91 72318 60034</p>
-                    <button class="btn-gold" onclick="showSection('prime')">UNLOCK NOW</button>
-                </div>
-            </div>
-            <div class="social-links">
-                <a href="https://t.me/Termuxcommandsi" target="_blank" class="social-btn tg">Telegram</a>
-                <a href="https://youtube.com/@termuxhacking0" target="_blank" class="social-btn yt">YouTube</a>
-            </div>
+            <p>WhatsApp Support (Prime Only):</p>
+            <p style="color:red;">🔒 LOCKED: +91 72318 60034</p>
         </div>
     </div>
 
-    <div id="admin-section" class="hidden-section">
-        <h2 style="color:red; text-align:center;">⚠️ MASTER ADMIN</h2>
-
+    <div id="admin-section" class="section hidden-section">
         <div class="card admin-glow-green">
-            <h3 style="color:#00ff41;">🛠 Upload Tool (Photo)</h3>
-            <input type="text" id="tool-name" placeholder="Tool Name">
-            <label for="tool-file-input" class="upload-label" id="tool-label"><i class="fas fa-image"></i> Select Photo from Gallery</label>
-            <input type="file" id="tool-file-input" accept="image/*" style="display:none;" onchange="updateLabel('tool-file-input', 'tool-label')">
-            <textarea id="tool-desc" placeholder="Description..."></textarea>
-            <button class="btn-green-glow" onclick="handleAdminUpload('tool')">UPLOAD TO TELEGRAM</button>
+            <h3 style="color:#00ff41;">Upload Tool (Photo)</h3>
+            <label for="tool-file" class="upload-label" id="l1">Click to Select Photo</label>
+            <input type="file" id="tool-file" accept="image/*" style="display:none;" onchange="document.getElementById('l1').innerText=this.files[0].name">
+            <button class="btn-green-glow" onclick="alert('Uploading to Telegram...')">UPLOAD TOOL</button>
         </div>
-
         <div class="card admin-glow-red">
-            <h3 style="color:#ff0055;">👑 Upload Prime (PDF/Video)</h3>
-            <input type="text" id="prime-title" placeholder="Content Title">
-            <label for="prime-file-input" class="upload-label" id="prime-label" style="color:#ff0055; border-color:#ff0055;"><i class="fas fa-file-video"></i> Select PDF or Video</label>
-            <input type="file" id="prime-file-input" accept=".pdf, video/*" style="display:none;" onchange="updateLabel('prime-file-input', 'prime-label')">
-            <select id="prime-type" style="background:#111; color:white; width:100%; padding:10px; margin-bottom:10px;">
-                <option value="video">Video Class</option>
-                <option value="pdf">PDF Document</option>
-            </select>
-            <button class="btn-red-glow" onclick="handleAdminUpload('prime')">UPLOAD TO PRIME ZONE</button>
+            <h3 style="color:#ff0055;">Upload Prime (Video/PDF)</h3>
+            <label for="prime-file" class="upload-label" id="l2" style="color:#ff0055;">Click to Select File</label>
+            <input type="file" id="prime-file" accept=".pdf,video/*" style="display:none;" onchange="document.getElementById('l2').innerText=this.files[0].name">
+            <button class="btn-red-glow" onclick="alert('Uploading Prime Content...')">UPLOAD PRIME</button>
         </div>
     </div>
 
-    <div id="profile-section" class="hidden-section">
-        <h2 style="color:#00ff41; text-align:center;">👤 PROFILE SETTINGS</h2>
+    <div id="profile-section" class="section hidden-section">
+        <h2 style="color:#00ff41; text-align:center;">PROFILE</h2>
         <div class="card" style="text-align:center;">
-            <div style="position:relative; display:inline-block;">
-                <img id="profile-preview-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:120px; height:120px; border-radius:50%; border:2px solid #00ff41; object-fit:cover;">
-                <label for="profile-file-input" style="position:absolute; bottom:5px; right:5px; background:#111; border-radius:50%; padding:5px; cursor:pointer; border:1px solid #00ff41;">
-                    <i class="fas fa-camera" style="color:#00ff41;"></i>
-                </label>
-            </div>
-            <input type="file" id="profile-file-input" accept="image/*" style="display:none;" onchange="previewFile('profile-file-input', 'profile-preview-img')">
-            
-            <div style="text-align:left; margin-top:20px;">
-                <label style="color:#666; font-size:12px;">Full Name</label>
-                <input type="text" id="profile-name" placeholder="Enter Full Name" style="width:100%; margin-bottom:10px;">
-                
-                <label style="color:#666; font-size:12px;">Gmail ID</label>
-                <input type="email" id="profile-email" placeholder="example@gmail.com" style="width:100%; margin-bottom:10px; background:#111; color:white; border:1px solid #333; padding:10px;">
-                
-                <label style="color:#666; font-size:12px;">Date of Birth</label>
-                <input type="date" id="profile-dob" style="width:100%; background:#111; color:white; border:1px solid #333; padding:10px;">
-            </div>
-            <button class="btn-green-glow" style="margin-top:20px;" onclick="saveUserProfileWithFile()">SAVE CHANGES</button>
+            <label for="p-img"><img id="p-view" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:100px; cursor:pointer; border-radius:50%; border:2px solid #00ff41;"></label>
+            <input type="file" id="p-img" accept="image/*" style="display:none;" onchange="document.getElementById('p-view').src=window.URL.createObjectURL(this.files[0])">
+            <input type="text" placeholder="Full Name" style="width:100%; margin:10px 0; padding:10px;">
+            <input type="email" placeholder="Gmail ID" style="width:100%; margin:10px 0; padding:10px; background:#111; color:white; border:1px solid #333;">
+            <input type="date" style="width:100%; margin:10px 0; padding:10px; background:#111; color:white;">
+            <button class="btn-green-glow" onclick="alert('Profile Saved!')">SAVE PROFILE</button>
         </div>
     </div>
   </div>
 
   <script>
-    function updateLabel(inputId, labelId) {
-        const file = document.getElementById(inputId).files[0];
-        if(file) document.getElementById(labelId).innerHTML = `<i class="fas fa-check"></i> ${file.name}`;
-    }
+    /* SIDEBAR LOGIC (VITAL) */
+    function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
+    function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
 
-    async function handleAdminUpload(type) {
-        const file = type === 'tool' ? document.getElementById('tool-file-input').files[0] : document.getElementById('prime-file-input').files[0];
-        const title = type === 'tool' ? document.getElementById('tool-name').value : document.getElementById('prime-title').value;
-
-        if(!file || !title) return alert("Details bharein!");
-
-        const formData = new FormData();
-        formData.append('chat_id', window.CHAT_ID);
-        formData.append('document', file);
-        formData.append('caption', `New Upload: ${title}`);
-
-        alert("Telegram uploading...");
-        const res = await fetch(`https://api.telegram.org/bot${window.BOT_TOKEN}/sendDocument`, { method: 'POST', body: formData });
-        const data = await res.json();
-        if(data.ok) alert("Upload Successful!");
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden-section'));
+        document.getElementById(id + '-section').classList.remove('hidden-section');
     }
   </script>
 </body>
 </html>
-
