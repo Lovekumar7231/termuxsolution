@@ -8,118 +8,154 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow: hidden;
+/* General Setup */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #080710;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
 }
 
-/* Background circles decoration */
+/* Background Circles - Positioned in Corners */
 body::before, body::after {
     content: "";
-    position: absolute;
+    position: fixed; /* कोनों में फिक्स रखने के लिए */
     border-radius: 50%;
     z-index: -1;
+    filter: blur(50px); /* हल्का ग्लो इफ़ेक्ट देने के लिए */
 }
 
+/* ऊपर वाला नीला गोला (Top Left Corner) */
 body::before {
-    height: 200px;
-    width: 200px;
+    height: 250px;
+    width: 250px;
     background: linear-gradient(#1845ad, #23a2f6);
-    left: 30%;
-    top: 10%;
+    left: -50px;
+    top: -50px;
 }
 
+/* नीचे वाला लाल/नारंगी गोला (Bottom Right Corner) */
 body::after {
-    height: 200px;
-    width: 200px;
+    height: 250px;
+    width: 250px;
     background: linear-gradient(to right, #ff512f, #f09819);
-    right: 30%;
-    bottom: 10%;
+    right: -50px;
+    bottom: -50px;
 }
 
-/* Glassmorphism Box */
+/* Glassmorphism Auth Box */
 .auth-box {
-    width: 350px;
-    background-color: rgba(255, 255, 255, 0.13);
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 50%;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+    width: 90%;
+    max-width: 380px;
+    background-color: rgba(255, 255, 255, 0.05); /* हल्का पारदर्शी */
+    border-radius: 15px;
+    backdrop-filter: blur(15px); /* कांच जैसा धुंधलापन */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     padding: 40px 30px;
+    z-index: 10;
 }
 
+/* Title Styling */
 .auth-box h2 {
     color: #ffffff;
     font-size: 28px;
-    font-weight: 500;
+    font-weight: 600;
     text-align: center;
     margin-bottom: 30px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-/* Input Fields styling */
+/* Input Grouping */
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .input-group label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 500;
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 600;
     color: #ffffff;
+    opacity: 0.8;
 }
 
+/* Modern Inputs */
 input {
     display: block;
-    height: 45px;
+    height: 48px;
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.07);
-    border-radius: 3px;
-    padding: 0 10px;
-    margin-top: 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 0 15px;
     font-size: 14px;
-    font-weight: 300;
-    color: #eeeeee;
-    border: none;
+    color: #ffffff;
     box-sizing: border-box;
+    transition: 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 input::placeholder {
-    color: #e5e5e5;
+    color: #aaaaaa;
 }
 
-/* Buttons like the photo */
+/* Security Check Box (Login Page) */
+#login-form div[style*="border:1px dashed"] {
+    border: 1px solid rgba(0, 255, 65, 0.3) !important;
+    background: rgba(0, 255, 65, 0.05);
+    border-radius: 5px;
+}
+
+/* Buttons */
 button {
-    margin-top: 20px;
+    margin-top: 25px;
     width: 100%;
     background-color: #ffffff;
     color: #080710;
-    padding: 15px 0;
-    font-size: 16px;
-    font-weight: 600;
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 700;
     border-radius: 5px;
     cursor: pointer;
     border: none;
-    transition: 0.3s ease;
+    text-transform: uppercase;
+    transition: 0.3s;
 }
 
 button:hover {
-    background-color: #e5e5e5;
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
 }
 
-/* Links color */
-.auth-links, .auth-links a {
-    color: #ffffff;
+/* Links */
+.auth-links, .auth-links a, #login-form div a {
+    color: #00ff41;
     text-align: center;
     margin-top: 20px;
     text-decoration: none;
     font-size: 13px;
+    display: block;
 }
 
-/* Specific to your captcha/admin form */
+.auth-links a:hover, #login-form div a:hover {
+    text-decoration: underline;
+}
+
+/* Captcha Question Color */
 #captcha-question {
-    color: gold !important;
+    color: #ffd700 !important;
 }
 
