@@ -1,116 +1,125 @@
-* {
+/* Background setup with circles like the photo */
+body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Courier New', monospace;
-}
-
-body {
-    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #080710;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #050505;
-    background-image:
-        radial-gradient(#111 15%, transparent 16%),
-        radial-gradient(#111 15%, transparent 16%);
-    background-size: 40px 40px;
-    color: #00ff41;
+    height: 100vh;
+    overflow: hidden;
 }
 
-/* MAIN CARD */
+/* Background circles decoration */
+body::before, body::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    z-index: -1;
+}
+
+body::before {
+    height: 200px;
+    width: 200px;
+    background: linear-gradient(#1845ad, #23a2f6);
+    left: 30%;
+    top: 10%;
+}
+
+body::after {
+    height: 200px;
+    width: 200px;
+    background: linear-gradient(to right, #ff512f, #f09819);
+    right: 30%;
+    bottom: 10%;
+}
+
+/* Glassmorphism Box */
 .auth-box {
-    width: 340px;
-    background: #0d1117;
-    border: 1px solid #00ff41;
-    padding: 35px 30px;
-    box-shadow: 0 0 25px rgba(0,255,65,0.25);
-    text-align: center;
+    width: 350px;
+    background-color: rgba(255, 255, 255, 0.13);
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+    padding: 40px 30px;
 }
 
-/* TITLE */
 .auth-box h2 {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 500;
+    text-align: center;
     margin-bottom: 30px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    font-size: 24px;
-    color: #00ff41;
-    text-shadow: 2px 2px red;
 }
 
-/* INPUT */
+/* Input Fields styling */
 .input-group {
-    text-align: left;
     margin-bottom: 20px;
 }
 
 .input-group label {
-    font-size: 11px;
-    color: #666;
-    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
 }
 
-.input-group input {
+input {
+    display: block;
+    height: 45px;
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    background: transparent;
+    background-color: rgba(255, 255, 255, 0.07);
+    border-radius: 3px;
+    padding: 0 10px;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 300;
+    color: #eeeeee;
     border: none;
-    border-bottom: 1px solid #333;
-    color: white;
+    box-sizing: border-box;
 }
 
-.input-group input:focus {
-    outline: none;
-    border-bottom: 1px solid #00ff41;
+input::placeholder {
+    color: #e5e5e5;
 }
 
-/* BUTTON */
+/* Buttons like the photo */
 button {
+    margin-top: 20px;
     width: 100%;
-    padding: 12px;
-    background: #00ff41;
-    border: none;
-    font-weight: bold;
+    background-color: #ffffff;
+    color: #080710;
+    padding: 15px 0;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 5px;
     cursor: pointer;
-    margin-top: 10px;
-    text-transform: uppercase;
-    box-shadow: 0 0 10px rgba(0,255,65,0.6);
+    border: none;
+    transition: 0.3s ease;
 }
 
 button:hover {
-    background: #00cc33;
+    background-color: #e5e5e5;
 }
 
-/* LINKS */
-.auth-links {
+/* Links color */
+.auth-links, .auth-links a {
+    color: #ffffff;
+    text-align: center;
     margin-top: 20px;
-    font-size: 12px;
-}
-
-.auth-links a {
-    color: #00ff41;
     text-decoration: none;
+    font-size: 13px;
 }
 
-.auth-links a:hover {
-    text-decoration: underline;
+/* Specific to your captcha/admin form */
+#captcha-question {
+    color: gold !important;
 }
 
-/* GLITCH TITLE */
-.glitch {
-    position: relative;
-    animation: flicker 1.5s infinite alternate;
-}
-
-@keyframes flicker {
-    0% { opacity: 1; }
-    50% { opacity: 0.8; }
-    100% { opacity: 1; }
-}
-
-/* BUTTON DISABLED */
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
