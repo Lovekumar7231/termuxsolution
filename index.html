@@ -7,6 +7,33 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
+    <style>
+        /* GLOW EFFECTS FOR SEARCH & ADMIN */
+        #search-input { transition: 0.3s; border: 1px solid #333; }
+        #search-input:focus { 
+            border: 1px solid #00ff41 !important; 
+            box-shadow: 0 0 15px #00ff41; 
+            outline: none; 
+        }
+
+        .admin-card-green { border: 1px solid #00ff41 !important; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
+        .admin-card-red { border: 1px solid #ff0055 !important; box-shadow: 0 0 10px rgba(255, 0, 85, 0.2); }
+
+        .btn-upload-green {
+            background: transparent; border: 1px solid #00ff41; color: #00ff41;
+            padding: 10px; width: 100%; cursor: pointer; transition: 0.4s; font-weight: bold;
+        }
+        .btn-upload-green:hover { background: #00ff41; color: #000; box-shadow: 0 0 20px #00ff41; }
+
+        .btn-upload-red {
+            background: transparent; border: 1px solid #ff0055; color: #ff0055;
+            padding: 10px; width: 100%; cursor: pointer; transition: 0.4s; font-weight: bold;
+        }
+        .btn-upload-red:hover { background: #ff0055; color: #fff; box-shadow: 0 0 20px #ff0055; }
+
+        .upload-box { border: 1px dashed #444; padding: 15px; text-align: center; margin: 10px 0; border-radius: 8px; }
+    </style>
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script type="module">
@@ -14,23 +41,26 @@
         import { getDatabase, ref, set, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-        // CONFIG (Apna Config Check kar lena)
+        // CONFIG
         window.dbConfig = {
             apiKey: "AIzaSyDVZCY-3xLepXzcdWGtR34wqdXqJQevI7Q",
             authDomain: "termuxhacking-aac55.firebaseapp.com",
             projectId: "termuxhacking-aac55",
-            storageBucket: "termuxhacking-aac55.firebasestorage.app", /* Storage Bucket Check karo */
+            storageBucket: "termuxhacking-aac55.firebasestorage.app",
             messagingSenderId: "921781091312",
             appId: "1:921781091312:web:39a1b96ceda5bc60b83b35"
         };
 
         const app = initializeApp(window.dbConfig);
-        const db = getDatabase(app);
-        const storage = getStorage(app);
+        window.db = getDatabase(app);
+        window.storage = getStorage(app);
 
-        // Global Export
-        window.db = db; window.dbRef = ref; window.dbSet = set; window.dbGet = get; window.dbPush = push; window.dbOnValue = onValue; window.dbUpdate = update;
-        window.storage = storage; window.sRef = sRef; window.uploadBytes = uploadBytes; window.getDownloadURL = getDownloadURL;
+        // TELEGRAM CONFIG
+        window.BOT_TOKEN = "8004087165:AAF-fMbvjDYSK64m0maGNf6oIUOvq9Xr-8w";
+        window.CHAT_ID = "-1001003225658257";
+
+        // EXPORT REFS
+        window.dbRef = ref; window.dbSet = set; window.dbPush = push; window.dbOnValue = onValue;
     </script>
 </head>
 <body onload="initApp()">
@@ -49,22 +79,19 @@
     <a onclick="showSection('about')"><i class="fas fa-info-circle"></i> About Us</a>
     <a onclick="showSection('profile')"><i class="fas fa-user-secret"></i> Profile</a>
     <a onclick="showSection('prime')" style="color:gold;"><i class="fas fa-crown"></i> Prime Zone</a>
-    
     <div id="admin-link" style="display:none; border-top:1px solid #333; margin-top:10px;">
         <p style="color:#666; font-size:12px; padding-left:20px; margin-top:10px;">ADMIN ACCESS</p>
         <a onclick="showSection('admin')" style="color:red;"><i class="fas fa-cogs"></i> Admin Panel</a>
     </div>
-
     <div id="loggedOutLinks" style="margin-top:20px;"><a href="login.html" style="color:#00ff41;">🔑 Login</a></div>
     <div id="loggedInLinks" style="display:none; margin-top:20px;"><a onclick="logout()" style="color:#ff0055;">🚪 Logout</a></div>
   </div>
 
   <div class="container">
-
     <div id="home-section" class="hidden-section" style="display:block;">
         <div style="margin-bottom: 20px; position:relative;">
             <input type="text" id="search-input" onkeyup="searchTools()" placeholder="🔍 Search Tool..." 
-                style="padding: 12px 15px; border-radius: 25px; border: 1px solid #00ff41; background: #111; color: white; width: 100%; outline:none;">
+                style="padding: 12px 15px; border-radius: 25px; background: #111; color: white; width: 100%;">
         </div>
         <h3>🔥 Latest Tools</h3>
         <div id="tools-grid"></div>
@@ -72,115 +99,82 @@
 
     <div id="about-section" class="hidden-section">
         <h2 style="color:#00ff41; text-align:center;">ℹ️ ABOUT US</h2>
-        
         <div class="card" style="text-align:center;">
             <img src="https://cdn-icons-png.flaticon.com/512/2092/2092663.png" style="width:100px; height:100px; margin-bottom:15px; filter: drop-shadow(0 0 10px #00ff41);">
             <h3 style="color:white;">Termux Hacking Family</h3>
-            
-            <div style="border: 1px dashed gold; padding:15px; margin:15px 0; border-radius:10px;">
-                <i class="fab fa-whatsapp" style="color:#25D366; font-size:24px;"></i> 
-                <span style="color:white; font-weight:bold;"> Official Support</span>
-                
-                <div id="wa-locked" style="margin-top:10px;">
-                    <p style="color:red; font-size:12px;">🔒 LOCKED (Prime Only)</p>
-                    <p style="filter: blur(5px); user-select: none; color:#aaa;">+91 72318 60034</p>
-                    <button class="btn-gold" onclick="showSection('prime')">UNLOCK NOW</button>
-                </div>
-
-                <div id="wa-unlocked" style="display:none; margin-top:10px;">
-                    <p style="color:#00ff41; font-weight:bold;">+91 72318 60034</p>
-                    <a href="https://wa.me/917231860034" target="_blank" class="btn-main" style="background:#25D366; color:white;">CHAT ON WHATSAPP</a>
-                </div>
-            </div>
-
             <div class="social-links">
                 <a href="https://t.me/Termuxcommandsi" target="_blank" class="social-btn tg"><i class="fab fa-telegram"></i> Telegram</a>
                 <a href="https://youtube.com/@termuxhacking0?si=a_bHzlUtcRO2AfIt" target="_blank" class="social-btn yt"><i class="fab fa-youtube"></i> YouTube</a>
-                <a href="https://www.instagram.com/termux_solution?igsh=cGM2aTVlY2J6a2c2" target="_blank" class="social-btn ig"><i class="fab fa-instagram"></i> Instagram</a>
-                <a href="https://www.facebook.com/share/17qmJ6McUR/" target="_blank" class="social-btn fb"><i class="fab fa-facebook"></i> Facebook</a>
             </div>
         </div>
     </div>
 
     <div id="prime-section" class="hidden-section">
         <h2 style="color:gold; text-align:center;">👑 PRIME MEMBERSHIP</h2>
-        <div class="card" style="text-align:center; border:2px solid gold;">
-            <i class="fas fa-crown fa-3x" style="color:gold; margin-bottom:10px;"></i>
-            <h3 style="color:white;">Premium Plan</h3>
-            <ul style="text-align:left; color:#ccc; list-style:none; padding-left:20px;">
-                <li>✅ Unlock WhatsApp Support</li>
-                <li>✅ Access Premium PDFs</li>
-                <li>✅ Private Hacking Videos</li>
-                <li>✅ Admin Support</li>
-            </ul>
-            <h2 style="color:#00ff41;">₹399 / Lifetime</h2>
-            
-            <div id="buy-btn-container">
-                <button class="btn-gold" onclick="startRazorpayPayment()">⚡ BUY NOW - ₹399</button>
-            </div>
-            <div id="already-prime" style="display:none;">
-                <p style="color:#00ff41; font-weight:bold; border:1px solid #00ff41; padding:10px;">✅ YOU ARE A PRIME MEMBER</p>
-            </div>
-        </div>
-
-        <h3 style="color:gold; margin-top:20px;">🔓 Prime Content</h3>
         <div id="prime-grid"></div>
     </div>
 
     <div id="admin-section" class="hidden-section">
         <h2 style="color:red; text-align:center;">⚠️ ADMIN PANEL</h2>
 
-        <div class="card" style="border: 1px solid #00ff41;">
-            <div class="card-content">
-                <h3 style="color:#00ff41;">🛠 Upload Tool</h3>
-                <input type="text" id="tool-name" placeholder="Tool Name">
-                <div class="upload-box"><label>Select Image</label><br><input type="file" id="tool-file-input" accept="image/*" style="color:white;"></div>
-                <textarea id="tool-desc" rows="3" placeholder="Description..."></textarea>
-                <textarea id="tool-cmds" rows="4" placeholder="Commands..."></textarea>
-                <button class="btn-main" id="upload-tool-btn" onclick="uploadToolWithImage()">UPLOAD TOOL</button>
-            </div>
+        <div class="card admin-card-green">
+            <h3 style="color:#00ff41;">🛠 Upload Tool (Image)</h3>
+            <input type="text" id="tool-name" placeholder="Tool Name">
+            <div class="upload-box"><input type="file" id="tool-file-input" accept="image/*"></div>
+            <textarea id="tool-desc" rows="3" placeholder="Description..."></textarea>
+            <button class="btn-upload-green" onclick="handleUpload('tool')">UPLOAD TO TELEGRAM</button>
         </div>
 
-        <div class="card" style="border: 1px solid gold; margin-top:20px;">
-             <div class="card-content">
-                <h3 style="color:gold;">👑 Upload Prime Content</h3>
-                <input type="text" id="prime-title" placeholder="Content Title">
-                
-                <div class="upload-box" style="border-color:gold;">
-                    <label style="color:gold;">Select PDF/Video</label><br>
-                    <input type="file" id="prime-file-input" accept=".pdf, video/*" style="color:white;">
-                </div>
-
-                <select id="prime-type" style="background:#111; color:white; margin:10px 0;">
-                    <option value="pdf">PDF Document</option>
-                    <option value="video">Video Class</option>
-                </select>
-
-                <button class="btn-gold" id="upload-prime-btn" onclick="uploadPrimeWithFile()">UPLOAD TO PRIME</button>
-            </div>
+        <div class="card admin-card-red" style="margin-top:20px;">
+            <h3 style="color:#ff0055;">👑 Upload Prime Content (PDF/Video)</h3>
+            <input type="text" id="prime-title" placeholder="Content Title">
+            <div class="upload-box"><input type="file" id="prime-file-input" accept=".pdf, video/*"></div>
+            <select id="prime-type" style="background:#111; color:white; margin:10px 0; width:100%; padding:10px;">
+                <option value="pdf">PDF Document</option>
+                <option value="video">Video Class</option>
+            </select>
+            <button class="btn-upload-red" onclick="handleUpload('prime')">UPLOAD TO PRIME</button>
         </div>
     </div>
-    
-    <div id="profile-section" class="hidden-section">
-        <h2 style="color:#00ff41; text-align:center;">👤 MY PROFILE</h2>
-        <div class="card" style="text-align:center;">
-             <img id="profile-preview-img" src="" style="width:100px; height:100px; border-radius:50%; border:2px solid #00ff41;">
-             <br><input type="file" id="profile-file-input" onchange="previewFile('profile-file-input', 'profile-preview-img')">
-             <input type="text" id="profile-name"><input type="date" id="profile-dob">
-             <button class="btn-main" id="save-profile-btn" onclick="saveUserProfileWithFile()">SAVE PROFILE</button>
-        </div>
-    </div>
-
-    <div id="articleModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title"></h2>
-            <img id="modal-img" src="" style="width:100%;">
-            <div id="modal-desc"></div>
-        </div>
-    </div>
-
   </div>
+
+  <script>
+    async function handleUpload(type) {
+        const fileInput = type === 'tool' ? document.getElementById('tool-file-input') : document.getElementById('prime-file-input');
+        const title = type === 'tool' ? document.getElementById('tool-name').value : document.getElementById('prime-title').value;
+        const file = fileInput.files[0];
+
+        if(!file || !title) return alert("Please fill all details and select a file!");
+
+        const formData = new FormData();
+        formData.append('chat_id', window.CHAT_ID);
+        formData.append('document', file);
+        formData.append('caption', `New Upload: ${title}\nType: ${type}`);
+
+        alert("Uploading to Telegram... please wait.");
+
+        try {
+            const response = await fetch(`https://api.telegram.org/bot${window.BOT_TOKEN}/sendDocument`, {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if(result.ok) {
+                const fileId = result.result.document ? result.result.document.file_id : result.result.video.file_id;
+                alert("Success! File ID generated. Now saving to Firebase...");
+                
+                // Firebase logic yahan aayega (aapke script.js ke mutabiq)
+                console.log("File ID:", fileId);
+            } else {
+                alert("Telegram Error: " + result.description);
+            }
+        } catch (e) {
+            alert("Upload failed. Check internet.");
+        }
+    }
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
+
